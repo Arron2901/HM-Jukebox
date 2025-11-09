@@ -4,6 +4,7 @@ import Search from "../components/Search";
 import AnimatedBackground from "../components/AnimatedBackground";
 import Playback from "../components/Playback";
 import Navbar from "../components/Navbar";
+import AdminOverlay from "../components/AdminOverlay";
 import "../App.css"
 
 import '@fontsource/roboto-mono';
@@ -16,6 +17,7 @@ import '@fontsource/roboto-mono/400-italic.css';
 export default function Home({ token }) {
   const [deviceId, setDeviceId] = useState(null);
   const [featuredPlaylists, setFeaturedPlaylists] = useState([])
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   const checkDeviceStatus = () => {
     if (!deviceId) {
@@ -41,12 +43,15 @@ export default function Home({ token }) {
   return (
     <div>
       <main className="main-content">
-        <Navbar />
+        <Navbar onAdminTrigger={() => setShowAdminPanel(true)} />
         <div className="content-body">
           <div className="container">
             <Playback/>
             <Search playTrack={playTrack}/>
           </div>
+          {showAdminPanel && (
+            <AdminOverlay onClose={() => setShowAdminPanel(false)} />
+          )}
         </div>
       </main>
       <SpotifyPlayer token={token} onReady={setDeviceId} />
