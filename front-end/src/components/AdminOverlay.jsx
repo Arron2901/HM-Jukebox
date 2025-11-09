@@ -1,8 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../styles/AdminOverlay.css";
 
 /** Simple right-side overlay for future admin controls. */
 const AdminOverlay = ({ onClose }) => {
+  useEffect(() => {
+    const slider = document.getElementById("volume_slider");
+    const output = document.getElementById("volume_value");
+    if (!slider || !output) return;
+
+    output.innerHTML = slider.value;
+
+    const handleInput = (event) => {
+      output.innerHTML = event.target.value;
+    };
+
+    slider.addEventListener("input", handleInput);
+    return () => slider.removeEventListener("input", handleInput);
+  }, []);
+
   return (
     <aside className="admin-overlay">
       <div className="admin-panel">
@@ -20,8 +35,8 @@ const AdminOverlay = ({ onClose }) => {
         <section className="admin-section">
           <h3>Volume Control</h3>
           <div className="admin-volume">
-            <input type="range" min="0" max="100" defaultValue="46" />
-            <span>46%</span>
+            <input id="volume_slider" type="range" min="0" max="100" defaultValue="50" />
+            <p><span id="volume_value"></span></p>
           </div>
         </section>
 
@@ -37,5 +52,6 @@ const AdminOverlay = ({ onClose }) => {
     </aside>
   );
 };
+
 
 export default AdminOverlay;
