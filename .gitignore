@@ -64,4 +64,4 @@ back-end/*.egg-info/
 # IDE files (if they are inside the back-end folder)
 back-end/.idea/
 back-end/.vscode/
-.cache
+*.cache
