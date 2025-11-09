@@ -1,0 +1,33 @@
+#root {
+  width: 100%;
+  text-align: center;
+  overflow-x: hidden;
+  height: 100vh;
+}
+
+.main-content {
+  margin-top: 1.5rem;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+
+  border-radius: 10px;
+
+  box-sizing: border-box; 
+  position: relative;
+  z-index: 3;
+
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+
+
+
+
+
+

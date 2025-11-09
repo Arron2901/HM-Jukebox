@@ -1,0 +1,66 @@
+# This .gitignore file goes in your ROOT directory.
+
+# Node.js dependencies
+# These are the modules installed by npm or yarn
+front-end/node_modules/
+
+# Build directory
+# This is the folder created when you run 'npm run build'
+front-end/build/
+
+# Log files and npm debug logs
+front-end/npm-debug.log*
+front-end/yarn-debug.log*
+front-end/yarn-error.log*
+
+# Environment variables
+# This file contains secret keys and API credentials.
+# Never commit this file.
+front-end/.env
+front-end/.env.local
+front-end/.env.development.local
+front-end/.env.test.local
+front-end/.env.production.local
+
+# Coverage reports from testing
+front-end/coverage/
+
+# Mac and Windows system files
+.DS_Store
+Thumbs.db
+
+
+# --- Python / FastAPI (back-end) ---
+
+# Virtual Environment
+# Never commit your 'venv' or '.venv' folder
+back-end/venv/
+back-end/.venv/
+back-end/env/
+
+# Environment variables
+# Contains secret keys and database URLs
+back-end/.env
+
+# Python cache and bytecode
+back-end/__pycache__/
+back-end/*.pyc
+*.pyc
+
+# Testing
+back-end/.pytest_cache/
+back-end/.coverage
+back-end/coverage.xml
+back-end/htmlcov/
+
+# Log files
+back-end/*.log
+
+# Build artifacts
+back-end/dist/
+back-end/build/
+back-end/*.egg-info/
+
+# IDE files (if they are inside the back-end folder)
+back-end/.idea/
+back-end/.vscode/

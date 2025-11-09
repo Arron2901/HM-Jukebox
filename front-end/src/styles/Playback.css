@@ -1,0 +1,113 @@
+.playback-container {
+    flex: 1;
+    border-right: 1px solid black;
+    height: 80vh;
+    padding-left: 0;
+    height: 85vh;
+}
+
+.now-playing-label {
+    font-family: "Roboto Mono";
+    text-align: left;
+    color: black;
+}
+
+.now-playing-image {
+    width: 80%;
+    border-radius: 44px;
+    box-shadow: 0 4px 8px 5px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: start;
+
+}
+
+
+.now-playing-song-title {
+    font-family: "Roboto Mono";
+    font-size: 40px;
+    text-align: left;
+    margin: 0;
+    color: black;
+    overflow: hidden;
+    height: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 500px;
+}
+
+.now-playing-song-artists {
+    font-family: "Roboto Mono";
+    font-size: 20px;
+    text-align: left;
+    margin: 0;
+    color: black;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 30px;
+    max-width: 500px;
+}
+
+.up-next-label {
+    font-family: "Roboto Mono";
+    font-size: 35px;
+    text-align: left;
+    margin: 30px 0 0 0;
+    color: black;
+}
+
+.queue-item {
+    margin-top: 15px;
+    display: flex;
+    border: 1px solid black;
+    border-radius: 20px;
+    max-width: 450px;
+    max-height: 60px;
+    min-height: 60px;
+    padding: 10px;
+    box-shadow: 5px 7px 4px 2px rgba(0, 0, 0, 0.25);
+    background-color: white;
+}
+
+.queue-item-image img {
+    flex: 1;
+    max-width: 60px;   
+    max-height: 60px;
+    border-radius: 10px;
+    box-shadow: 0px 6px 20px 0px rgba(0, 0, 0, 0.15);
+    float: left;}
+
+.queue-item-text {
+    color: black;
+    font-family: "Roboto Mono";
+    /* margin-right: 100px; */
+}
+
+.queue-item-text h3 {
+    padding: 0;
+    margin: 0 0 0 10px;
+    font-size: 25px;
+    width: 300px;
+    text-align: left;
+}
+
+.queue-item-text p {
+    padding: 0;
+    margin: 0 0 0 10px;
+    text-align: left;
+}
+
+.queue-item-time p {
+    margin-left: 40px;
+    text-align: right;
+}
+
+.queue-container {
+    overflow: hidden;
+    overflow-y: auto;
+    max-height: 25vh;
+    padding-bottom: 15px;
+    scrollbar-width: none;
+}
+
