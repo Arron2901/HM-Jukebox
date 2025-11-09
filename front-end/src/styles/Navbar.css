@@ -1,24 +1,41 @@
-/* --- Main Navbar Container --- */
 .navbar {
+    width: 100%;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    
-    height: 50px;
-    width: 100vw;
-    
+    gap: 12px;
+    margin: 0;
+    padding: 0 0 8px;
+    border-bottom: 1px solid #0f0f0f;
     color: black;
-    
-    position: sticky;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    /* background-color: blue; */
-
-    padding: 30px 0px 10px 35px;
 }
 
 .navbar-title {
-    font-family: "Roboto Mono";
-    font-size: 40px;
+    font-family: "Roboto Mono", sans-serif;
+    font-size: clamp(2.4rem, 3vw, 3.2rem);
+    font-weight: 700;
+    margin-top: 3vh;
+    margin-bottom: 0px;
+    text-align: left;
+}
+
+.navbar-logo {
+    width: 96px;
+    height: auto;
+    filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.15));
+}
+
+@media (max-width: 800px) {
+  .playback-container {
+    display: none;
+  }
+
+  .navbar-title {
+    font-size: 5vw;
+    margin-top: 0;
+  }
+
+  .navbar-logo {
+    display: none;
+  }
 }

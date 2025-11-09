@@ -1,113 +1,192 @@
 .playback-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-right: 24px;
+    border-right: 1px solid #0f0f0f;
+    height: 100%;
     flex: 1;
-    border-right: 1px solid black;
-    height: 80vh;
-    padding-left: 0;
-    height: 85vh;
+    width: 100%;
+    max-width: 37vw;
+    min-height: 0;
 }
 
 .now-playing-label {
-    font-family: "Roboto Mono";
+    font-family: "Roboto Mono", sans-serif;
+    font-size: 1.2rem;
     text-align: left;
-    color: black;
+    color: #0f0f0f;
+    margin-bottom: 12px;
+    margin-top: 0px;
 }
 
 .now-playing-image {
-    width: 80%;
-    border-radius: 44px;
-    box-shadow: 0 4px 8px 5px rgba(0, 0, 0, 0.25);
-    display: flex;
-    align-items: start;
-
+    width: clamp(300px, 85%, 400px);
+    height: 35vh;
+    width: 35vh;
+    border-radius: 32px;
+    object-fit: cover;
+    box-shadow: 0 20px 35px rgba(15, 13, 33, 0.25);
 }
 
-
 .now-playing-song-title {
-    font-family: "Roboto Mono";
-    font-size: 40px;
+    font-family: "Roboto Mono", sans-serif;
+    font-size: clamp(2rem, 2.8vw, 3rem);
     text-align: left;
-    margin: 0;
-    color: black;
-    overflow: hidden;
-    height: 50px;
+    color: #050505;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 500px;
+    width: 90%;
+    margin: 5px;
 }
 
 .now-playing-song-artists {
-    font-family: "Roboto Mono";
-    font-size: 20px;
+    font-family: "Roboto Mono", sans-serif;
+    font-size: 1.25rem;
     text-align: left;
-    margin: 0;
-    color: black;
+    margin: 0px 0 0;
+    color: var(--text-muted);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    height: 30px;
-    max-width: 500px;
+    width: 90%;
 }
 
 .up-next-label {
-    font-family: "Roboto Mono";
-    font-size: 35px;
+    font-family: "Roboto Mono", sans-serif;
+    font-size: 1.8rem;
     text-align: left;
-    margin: 30px 0 0 0;
-    color: black;
+    margin: 12px 0 0;
+    color: #050505;
 }
 
-.queue-item {
-    margin-top: 15px;
-    display: flex;
-    border: 1px solid black;
-    border-radius: 20px;
-    max-width: 450px;
-    max-height: 60px;
-    min-height: 60px;
-    padding: 10px;
-    box-shadow: 5px 7px 4px 2px rgba(0, 0, 0, 0.25);
-    background-color: white;
-}
-
-.queue-item-image img {
+.playback-queue {
     flex: 1;
-    max-width: 60px;   
-    max-height: 60px;
-    border-radius: 10px;
-    box-shadow: 0px 6px 20px 0px rgba(0, 0, 0, 0.15);
-    float: left;}
-
-.queue-item-text {
-    color: black;
-    font-family: "Roboto Mono";
-    /* margin-right: 100px; */
-}
-
-.queue-item-text h3 {
-    padding: 0;
-    margin: 0 0 0 10px;
-    font-size: 25px;
-    width: 300px;
-    text-align: left;
-}
-
-.queue-item-text p {
-    padding: 0;
-    margin: 0 0 0 10px;
-    text-align: left;
-}
-
-.queue-item-time p {
-    margin-left: 40px;
-    text-align: right;
-}
-
-.queue-container {
-    overflow: hidden;
+    width: 100%;
+    padding-right: 30px;
+    margin-top: 16px;
     overflow-y: auto;
-    max-height: 25vh;
-    padding-bottom: 15px;
-    scrollbar-width: none;
+    scrollbar-width: thin;
+    min-height: 0;
 }
 
+.playback-queue::-webkit-scrollbar {
+    width: 6px;
+}
+
+.playback-queue::-webkit-scrollbar-thumb {
+    background: #b1b1b1;
+    border-radius: 3px;
+}
+
+.playback-queue::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.playback-queue-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-radius: 16px;
+    padding: 10px 16px;
+    background: #ffffff;
+    border: 1px solid #0f0f0f;
+    margin-bottom: 14px;
+    box-shadow: 6px 8px 8px rgba(19, 15, 30, 0.16);
+}
+
+.playback-queue-item:last-child {
+    margin-bottom: 15px;
+}
+
+.playback-queue-item-image img {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 1px solid #0f0f0f;
+    box-shadow: 0 12px 18px rgba(13, 13, 26, 0.15);
+}
+
+.playback-queue-item-text {
+    flex: 1;
+    color: #050505;
+    font-family: "Roboto Mono", sans-serif;
+    overflow: hidden;
+}
+
+.playback-queue-item-text h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.playback-queue-item-text p {
+    margin: 4px 0 0;
+    text-align: left;
+    color: #4b4b57;
+    font-size: 0.95rem;
+}
+
+.playback-queue-item-time p {
+    margin: 0;
+    font-size: 1rem;
+    color: #1e1e1e;
+}
+
+.marquee {
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.marquee__inner {
+    display: inline-block;
+    min-width: 100%;
+}
+
+.marquee--active .marquee__inner {
+    animation: marquee-slide 12s ease-in-out infinite alternate;
+}
+
+@keyframes marquee-slide {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(calc(-1 * var(--marquee-distance, 0px)));
+    }
+}
+
+@media (max-width: 1000px) {
+  .playback-container {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .now-playing-image {
+    width: 30vh;
+    height: 30vh;
+  }
+}
+
+@media (max-height: 700px) {
+  .now-playing-image {
+    height: 25vh;
+    width: 25vh;
+  }
+
+  .now-playing-song-title {
+    font-size: 1.3em;
+  }
+
+  .now-playing-song-artists {
+    font-size: 1em;
+  }
+}

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import SpotifyPlayer from "../components/spotifyPlayer";
-import Logo from "../components/Logo";
 import Search from "../components/Search"; 
 import AnimatedBackground from "../components/AnimatedBackground";
 import Playback from "../components/Playback";
@@ -41,26 +40,17 @@ export default function Home({ token }) {
 
   return (
     <div>
-      <Navbar />
-      <main className="main-content ">
-        <div className="container">
-          <Playback/>
-          <Search playTrack={playTrack}/>
+      <main className="main-content">
+        <Navbar />
+        <div className="content-body">
+          <div className="container">
+            <Playback/>
+            <Search playTrack={playTrack}/>
+          </div>
         </div>
-
-        {/* <div className="container bottom">
-          <Search playTrack={playTrack}/>
-        </div> */}
-        
-        
-        
-        
-        
       </main>
       <SpotifyPlayer token={token} onReady={setDeviceId} />
       <AnimatedBackground/>
     </div>
   );
 }
-
-
