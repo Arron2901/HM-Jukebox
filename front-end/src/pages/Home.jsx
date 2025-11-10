@@ -16,6 +16,70 @@ import "@fontsource/roboto-mono/400-italic.css";
 // Hard-coded safety net playlist to keep music running when the queue is empty.
 const FALLBACK_PLAYLIST_ID = "6koaBLo3EPH96TlQkpWUxa";
 
+// Playlist metadata used for curated cards.
+const basePlaylistConfig = () => {
+  const now = new Date();
+  const holiday = (now.getMonth() === 10 && now.getDate() >= 1) || (now.getMonth() === 11 && now.getDate() <= 28);
+
+  return [
+    {
+      id: "eras",
+      heading: "Playlists from the Eras",
+      playlists: [
+        {
+          id: "80s",
+          title: "80s Hits",
+          playlistId: "3MirNEFoRiSgd6atQrQ4eW",
+          fallbackCover: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da847bb2e74941cc0a2532798f6d",
+        },
+        {
+          id: "all-out-90s",
+          title: "All Out 90s",
+          playlistId: "4Yq0M74gg8oYQh16o8ve8Y",
+          fallbackCover: "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da84dd8afedcc17fc2fbc9b50032",
+        },
+        {
+          id: "all-out-00s",
+          title: "All Out 00s",
+          playlistId: "5nkn4PuVCtfMztJADQ0uR9",
+          fallbackCover: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da8467629902bf10d09d5ee1098f",
+        },
+      ],
+    },
+    {
+      id: "genres",
+      heading: "Playlists from the Genres",
+      playlists: [
+        {
+          id: "pop-mix",
+          title: "Pop Mix",
+          playlistId: "0iGaX1GZgca1EO7Tsjicln",
+          fallbackCover: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da849b4db9b8b7a5211d4fee342d",
+        },
+        holiday
+          ? {
+              id: "christmas-mix",
+              title: "Christmas Mix",
+              playlistId: "2uSlS3yN0r3MRK2vUS3rEu",
+              fallbackCover: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84d49a1fe9c349be1dda04dcc7",
+            }
+          : {
+              id: "rock-mix",
+              title: "Rock Mix",
+              playlistId: "3tx8h1aph7mrx0HzDbC9b2",
+              fallbackCover: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84c37f54cb119274d11490b021",
+            },
+        {
+          id: "musical-mix",
+          title: "Musical Mix",
+          playlistId: "6KfbVFomPKKQWfGpc1O1mA",
+          fallbackCover: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84f9b1517d2cfaa53c8bf7a371",
+        },
+      ],
+    },
+  ];
+};
+
 // Normalizes Spotify’s playlist-track payload into the shape our UI expects.
 const mapSpotifyItem = (item) => {
   const track = item?.track;
@@ -81,6 +145,9 @@ export default function Home({ token, onManualRefreshToken }) {
   const [trackProgress, setTrackProgress] = useState({ position: 0, duration: 0 });
   const [externalSearch, setExternalSearch] = useState(null);
   const [playlistLoading, setPlaylistLoading] = useState(false);
+  const [playlistCovers, setPlaylistCovers] = useState({});
+
+  const curatedSections = useMemo(() => basePlaylistConfig(), []);
 
   // Mirror select state in refs so long-running callbacks can read latest values without stale closures.
   const fallbackQueueRef = useSyncedRef(fallbackQueue);
@@ -141,6 +208,49 @@ export default function Home({ token, onManualRefreshToken }) {
   useEffect(() => {
     fetchFallbackPlaylist();
   }, [fetchFallbackPlaylist]);
+
+  useEffect(() => {
+    if (!token) return;
+    const abortController = new AbortController();
+    const loadCovers = async () => {
+      const ids = Array.from(
+        new Set(
+          curatedSections.flatMap((section) => section.playlists.map((playlist) => playlist.playlistId))
+        )
+      );
+      try {
+        const results = await Promise.all(
+          ids.map(async (playlistId) => {
+            try {
+              const res = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+                signal: abortController.signal,
+              });
+              if (!res.ok) throw new Error(`Failed to fetch playlist ${playlistId}`);
+              const data = await res.json();
+              return { playlistId, cover: data.images?.[0]?.url || null };
+            } catch (error) {
+              console.error("Playlist cover fetch failed", playlistId, error);
+              return { playlistId, cover: null };
+            }
+          })
+        );
+        setPlaylistCovers((prev) => {
+          const next = { ...prev };
+          results.forEach(({ playlistId, cover }) => {
+            if (cover) next[playlistId] = cover;
+          });
+          return next;
+        });
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error("Failed to load playlist covers", error);
+        }
+      }
+    };
+    loadCovers();
+    return () => abortController.abort();
+  }, [token, curatedSections]);
 
   // Ensures the Web Playback SDK device becomes the active Spotify target.
   const transferPlayback = useCallback(
@@ -531,6 +641,16 @@ export default function Home({ token, onManualRefreshToken }) {
   }, []);
 
   // Compose the “Up Next” list by prioritizing user tracks and filling the rest with fallback picks.
+  const resolvedPlaylistSections = useMemo(() => {
+    return curatedSections.map((section) => ({
+      ...section,
+      playlists: section.playlists.map((playlist) => ({
+        ...playlist,
+        cover: playlistCovers[playlist.playlistId] || playlist.fallbackCover || "",
+      })),
+    }));
+  }, [curatedSections, playlistCovers]);
+
   const upcomingQueue = useMemo(() => {
     const userUris = new Set(userQueue.map((track) => track.uri));
     const fallbackStart = fallbackQueue
@@ -585,6 +705,7 @@ export default function Home({ token, onManualRefreshToken }) {
               externalResults={externalSearch?.results}
               externalLoading={playlistLoading}
               onClearExternalResults={handleClearExternalSearch}
+              playlistSections={resolvedPlaylistSections}
             />
           </div>
           {showAdminPanel && (

@@ -3,62 +3,6 @@ import { searchTracks } from "../api/spotifyAPI";
 import VirtualKeyboard from "./VirtualKeyboard";
 import "../styles/Search.css";
 
-// Predefined playlist blocks shown below the search panel.
-const playlistSections = [
-  {
-    id: "eras",
-    heading: "Playlists from the Eras",
-    playlists: [
-      {
-        id: "80s",
-        title: "80s Hits",
-        cover: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da847bb2e74941cc0a2532798f6d",
-        playlistId: "3MirNEFoRiSgd6atQrQ4eW",
-      },
-      {
-        id: "all-out-90s",
-        title: "All Out 90s",
-        cover: "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da84dd8afedcc17fc2fbc9b50032",
-        playlistId: "4Yq0M74gg8oYQh16o8ve8Y",
-      },
-      {
-        id: "all-out-00s",
-        title: "All Out 00s",
-        cover: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da8467629902bf10d09d5ee1098f",
-        playlistId: "5nkn4PuVCtfMztJADQ0uR9",
-      },
-    ],
-  },
-  {
-    id: "genres",
-    heading: "Playlists from the Genres",
-    playlists: [
-      {
-        id: "pop-mix",
-        title: "Pop Mix",
-        cover: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da849b4db9b8b7a5211d4fee342d",
-        playlistId: "0iGaX1GZgca1EO7Tsjicln",
-      },
-      {
-        id: "rock-mix",
-        title: "Rock Mix",
-        cover: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84c37f54cb119274d11490b021",
-        playlistId: "3tx8h1aph7mrx0HzDbC9b2",
-      },
-      {
-        id: "musical-mix",
-        title: "Musical Mix",
-        cover: "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84f9b1517d2cfaa53c8bf7a371",
-        playlistId: "6KfbVFomPKKQWfGpc1O1mA",
-      },
-    ],
-  },
-];
-
-/**
- * Search lets users type (or tap via the virtual keyboard), preview results,
- * and feed both ad-hoc searches and curated playlist picks into the queue.
- */
 export default function Search({
   onAddTrack,
   onPlaylistSelect,
@@ -68,6 +12,7 @@ export default function Search({
   onClearExternalResults,
   showPlaylists = true,
   enableKeyboard = true,
+  playlistSections = [],
 }) {
   const [query, setQuery] = useState("");
   const [tracks, setTracks] = useState([]);
@@ -94,6 +39,7 @@ export default function Search({
     // Reset playlist-driven state so manual search feels clean.
     onClearExternalResults?.();
     setShowingExternal(false);
+    setTracks([]);
   };
 
   const handleSearch = async (e) => {
@@ -207,7 +153,6 @@ export default function Search({
                 onClick={() => onPlaylistSelect?.(playlist.playlistId, playlist.title)}
               >
                 <img src={playlist.cover} alt={playlist.title} />
-                <span>{playlist.title}</span>
               </button>
             ))}
           </div>
