@@ -9,7 +9,9 @@ scope = (
     "user-read-currently-playing "
     "playlist-read-private "
     "streaming "
-    "app-remote-control"
+    "app-remote-control "
+    "user-read-email "
+    "user-read-private"
 )
 
 
@@ -25,7 +27,9 @@ class SpotifyRepository:
             "user-read-currently-playing "
             "playlist-read-private "
             "streaming "
-            "app-remote-control"
+            "app-remote-control "
+            "user-read-email "
+            "user-read-private"
         )
 
         self.sp_oauth = SpotifyOAuth(

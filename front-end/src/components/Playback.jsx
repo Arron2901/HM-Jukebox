@@ -1,109 +1,69 @@
-import React, { useState } from "react";
+import React from "react";
 import MarqueeText from "./MarqueeText";
 import "../styles/Playback.css";
 
-export default function Playback() {
-  const [query, setQuery] = useState("");
-  const [tracks, setTracks] = useState([]);
+const formatDuration = (ms = 0) => {
+  if (!ms && ms !== 0) return "0:00";
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+};
 
+const placeholderImage = "https://i.scdn.co/image/ab67616d0000b2735bde2cf3db31145f11ffc045";
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!query) return;
-    const result = await searchTracks(query);
-    setTracks(result);
-  };
+export default function Playback({ currentTrack, queue = [], progress }) {
+  const nextItems = queue.slice(0, 5);
+  const position = progress?.position ?? 0;
+  const duration = progress?.duration ?? currentTrack?.duration_ms ?? 0;
 
   return (
-        <div className="playback-container">
-            <h2 className="now-playing-label">Now Playing...</h2>
+    <div className="playback-container">
+      <h2 className="now-playing-label">Now Playing...</h2>
 
-            <img src="https://i.scdn.co/image/ab67616d0000b2735bde2cf3db31145f11ffc045" alt="" className="now-playing-image"/>
-            
-            <MarqueeText as="h1" className="now-playing-song-title">
-              Revenge Revenge Revengeddddddddddddd
-            </MarqueeText>
-            <h1 as="h3" className="now-playing-song-artists"><MarqueeText>Captainsparklez, Tryhardninja, Captainsparklez</MarqueeText></h1>
+      {currentTrack ? (
+        <img
+          src={currentTrack.albumArt || placeholderImage}
+          alt={currentTrack.name}
+          className="now-playing-image"
+        />
+      ) : (
+        <div className="now-playing-placeholder">Waiting for playback…</div>
+      )}
 
-            <h1 className="up-next-label">Up Next</h1>
+      <MarqueeText as="h1" className="now-playing-song-title">
+        {currentTrack?.name || "No track queued"}
+      </MarqueeText>
+      <div className="now-playing-meta">
+        <MarqueeText as="h3" className="now-playing-song-artists">
+          {currentTrack?.artists || "Add a song to kick things off"}
+        </MarqueeText>
+        <span className="now-playing-progress">
+          {formatDuration(position)} / {formatDuration(duration)}
+        </span>
+      </div>
 
-            <div className="playback-queue">
-                <div className="playback-queue-item">
-                    <div className="playback-queue-item-image">
-                        <img src="https://i.scdn.co/image/ab67616d0000b2735bde2cf3db31145f11ffc045" alt=""/>
-                    </div>
-                    <div className="playback-queue-item-text">
-                        <MarqueeText as="h3" className="playback-queue-track-name">
-                          Life is a highway and also a really long piece of text
-                        </MarqueeText>
-                        <p>Forrest, Valentino</p>
-                    </div>
-                    <div className="playback-queue-item-time">
-                        <p>3:12</p>
-                    </div>
-                </div>
+      <h1 className="up-next-label">Up Next</h1>
 
-                <div className="playback-queue-item">
-                    <div className="playback-queue-item-image">
-                        <img src="https://i.scdn.co/image/ab67616d0000b2735bde2cf3db31145f11ffc045" alt=""/>
-                    </div>
-                    <div className="playback-queue-item-text">
-                        <MarqueeText as="h3" className="playback-queue-track-name">
-                          Gods Plan
-                        </MarqueeText>
-                        <p>Drake</p>
-                    </div>
-                    <div className="playback-queue-item-time">
-                        <p>3:12</p>
-                    </div>
-                </div>
-
-                <div className="playback-queue-item">
-                    <div className="playback-queue-item-image">
-                        <img src="https://i.scdn.co/image/ab67616d0000b2735bde2cf3db31145f11ffc045" alt=""/>
-                    </div>
-                    <div className="playback-queue-item-text">
-                        <MarqueeText as="h3" className="playback-queue-track-name">
-                          Hawk Tuah
-                        </MarqueeText>
-                        <p>Hawk Tuah Girl</p>
-                    </div>
-                    <div className="playback-queue-item-time">
-                        <p>3:12</p>
-                    </div>
-                </div>
-
-                <div className="playback-queue-item">
-                    <div className="playback-queue-item-image">
-                        <img src="https://i.scdn.co/image/ab67616d0000b2735bde2cf3db31145f11ffc045" alt=""/>
-                    </div>
-                    <div className="playback-queue-item-text">
-                        <MarqueeText as="h3" className="playback-queue-track-name">
-                          Fat Forrest
-                        </MarqueeText>
-                        <p>Julie</p>
-                    </div>
-                    <div className="playback-queue-item-time">
-                        <p>3:12</p>
-                    </div>
-                </div>
-
-                <div className="playback-queue-item">
-                    <div className="playback-queue-item-image">
-                        <img src="https://i.scdn.co/image/ab67616d0000b2735bde2cf3db31145f11ffc045" alt=""/>
-                    </div>
-                    <div className="playback-queue-item-text">
-                        <MarqueeText as="h3" className="playback-queue-track-name">
-                          Fat Valentino
-                        </MarqueeText>
-                        <p>Julie</p>
-                    </div>
-                    <div className="playback-queue-item-time">
-                        <p>3:12</p>
-                    </div>
-                </div>
+      <div className="playback-queue">
+        {nextItems.length === 0 && <p>No songs queued. Searching will add them here.</p>}
+        {nextItems.map((track) => (
+          <div key={track.uri} className="playback-queue-item">
+            <div className="playback-queue-item-image">
+              <img src={track.albumArt || placeholderImage} alt={track.name} />
             </div>
-        
-        </div>
+            <div className="playback-queue-item-text">
+              <MarqueeText as="h3" className="playback-queue-track-name">
+                {track.name}
+              </MarqueeText>
+              <p>{track.artists}</p>
+            </div>
+            <div className="playback-queue-item-time">
+              <p>{formatDuration(track.duration_ms)}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

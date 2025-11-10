@@ -1,22 +1,16 @@
-import React, { useEffect } from "react";
+import React from "react";
 import "../styles/AdminOverlay.css";
 
 /** Simple right-side overlay for future admin controls. */
-const AdminOverlay = ({ onClose }) => {
-  useEffect(() => {
-    const slider = document.getElementById("volume_slider");
-    const output = document.getElementById("volume_value");
-    if (!slider || !output) return;
-
-    output.innerHTML = slider.value;
-
-    const handleInput = (event) => {
-      output.innerHTML = event.target.value;
-    };
-
-    slider.addEventListener("input", handleInput);
-    return () => slider.removeEventListener("input", handleInput);
-  }, []);
+const AdminOverlay = ({
+  onClose,
+  isPlaying,
+  volume,
+  onPlayPause,
+  onPrev,
+  onNext,
+  onVolumeChange,
+}) => {
 
   return (
     <aside className="admin-overlay">
@@ -26,17 +20,24 @@ const AdminOverlay = ({ onClose }) => {
         <section className="admin-section">
           <h3>Playback Controls</h3>
           <div className="admin-playback-buttons">
-            <button type="button">⏮</button>
-            <button type="button">⏯</button>
-            <button type="button">⏭</button>
+            <button type="button" onClick={onPrev}>⏮</button>
+            <button type="button" onClick={onPlayPause}>{isPlaying ? "⏸" : "▶"}</button>
+            <button type="button" onClick={onNext}>⏭</button>
           </div>
         </section>
 
         <section className="admin-section">
           <h3>Volume Control</h3>
           <div className="admin-volume">
-            <input id="volume_slider" type="range" min="0" max="100" defaultValue="50" />
-            <p><span id="volume_value"></span></p>
+            <input
+              id="volume_slider"
+              type="range"
+              min="0"
+              max="100"
+              value={volume}
+              onChange={(event) => onVolumeChange?.(Number(event.target.value))}
+            />
+            <p><span id="volume_value">{volume}</span></p>
           </div>
         </section>
 

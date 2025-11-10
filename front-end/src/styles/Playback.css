@@ -22,11 +22,24 @@
 
 .now-playing-image {
     width: clamp(300px, 85%, 400px);
-    height: 35vh;
-    width: 35vh;
+    height: clamp(280px, 70vh, 360px);
     border-radius: 32px;
     object-fit: cover;
     box-shadow: 0 20px 35px rgba(15, 13, 33, 0.25);
+}
+
+.now-playing-placeholder {
+    width: clamp(300px, 85%, 400px);
+    height: clamp(280px, 70vh, 360px);
+    border-radius: 32px;
+    border: 1px dashed rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    color: #4b4b57;
+    margin-bottom: 18px;
 }
 
 .now-playing-song-title {
@@ -51,6 +64,20 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 90%;
+}
+
+.now-playing-meta {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.now-playing-progress {
+    font-family: "Roboto Mono", sans-serif;
+    font-size: 1rem;
+    color: #050505;
+    margin-left: auto;
 }
 
 .up-next-label {
