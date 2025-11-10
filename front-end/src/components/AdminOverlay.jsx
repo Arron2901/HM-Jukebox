@@ -15,6 +15,11 @@ const AdminOverlay = ({
   onVolumeChange,
   onRefreshToken,
 }) => {
+  // Sends a signal to the helper extension so Chrome brings the AutoDarts tab forward (or opens it).
+  const handleOpenAutodarts = () => {
+    if (typeof window === "undefined") return;
+    window.postMessage({ source: "HM_JUKEBOX_ADMIN", type: "OPEN_AUTODARTS" }, "*");
+  };
 
   return (
     <aside className="admin-overlay">
@@ -51,6 +56,9 @@ const AdminOverlay = ({
             <button type="button" className="admin-accent">Git Pull</button>
             <button type="button" className="admin-accent" onClick={onRefreshToken}>
               Refresh Spotify Token
+            </button>
+            <button type="button" className="admin-accent" onClick={handleOpenAutodarts}>
+              Open AutoDarts
             </button>
           </div>
         </section>
