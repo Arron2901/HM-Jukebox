@@ -131,7 +131,7 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  * Home orchestrates the entire kiosk experience: Spotify SDK setup, queue juggling,
  * playback polling, admin controls, and the main search/playback layout.
  */
-export default function Home({ token, onManualRefreshToken }) {
+export default function Home({ token, onManualRefreshToken, onAuthFailure }) {
   // Core playback/session state
   const [deviceId, setDeviceId] = useState(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
@@ -230,7 +230,9 @@ export default function Home({ token, onManualRefreshToken }) {
               const data = await res.json();
               return { playlistId, cover: data.images?.[0]?.url || null };
             } catch (error) {
-              console.error("Playlist cover fetch failed", playlistId, error);
+              if (error.name !== "AbortError") {
+                console.error("Playlist cover fetch failed", playlistId, error);
+              }
               return { playlistId, cover: null };
             }
           })
@@ -494,7 +496,7 @@ export default function Home({ token, onManualRefreshToken }) {
 
       maybeTriggerAdvance(!state.paused, state.position, duration);
 
-      if (state.paused && !pauseRequestedRef.current && !state.context?.metadata?.is_paused_by_user) {
+      if (state.paused && !pauseRequestedRef.current) {
         maybeTriggerAdvance(false, duration, duration);
       }
     },

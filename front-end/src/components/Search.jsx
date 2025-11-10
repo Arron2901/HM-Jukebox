@@ -153,7 +153,15 @@ export default function Search({
                 className="playlist-card"
                 onClick={() => onPlaylistSelect?.(playlist.playlistId, playlist.title)}
               >
-                <img src={playlist.cover} alt={playlist.title} />
+                <img
+                  src={playlist.cover}
+                  alt={playlist.title}
+                  onError={(event) => {
+                    if (playlist.fallbackCover && event.currentTarget.src !== playlist.fallbackCover) {
+                      event.currentTarget.src = playlist.fallbackCover;
+                    }
+                  }}
+                />
               </button>
             ))}
           </div>

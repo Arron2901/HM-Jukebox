@@ -59,6 +59,11 @@ function App() {
         const expiresIn = data.expires_in || 3600;
         setToken(data.access_token);
         setTokenExpiresAt(Date.now() + expiresIn * 1000);
+        console.log(
+          "[Auth] Refreshed Spotify token. Expires in",
+          expiresIn,
+          "seconds"
+        );
         return expiresIn;
       }
       console.error("Failed to refresh Spotify token", data);
@@ -96,10 +101,20 @@ function App() {
     const next = await refreshAccessToken();
     if (next) {
       scheduleRefresh(next);
-    } else {
-      refreshTimeout.current = setTimeout(scheduleRefresh, REFRESH_BACKOFF_MS);
+      return true;
     }
+    refreshTimeout.current = setTimeout(scheduleRefresh, REFRESH_BACKOFF_MS);
+    return false;
   }, [refreshAccessToken, scheduleRefresh]);
+
+  const handleAuthFailure = useCallback(async () => {
+    const success = await handleManualRefresh();
+    if (!success) {
+      setToken(null);
+      setTokenExpiresAt(0);
+    }
+    return success;
+  }, [handleManualRefresh]);
 
   const ensureFreshToken = useCallback(() => {
     if (!tokenExpiresAt || Date.now() < tokenExpiresAt - 60000) {
@@ -141,6 +156,15 @@ function App() {
     };
   }, [ensureFreshToken]);
 
+  useEffect(() => {
+    if (isRemoteClient || !token) return;
+    const interval = setInterval(() => {
+      console.log("[Auth] 30-minute proactive refresh tick");
+      handleManualRefresh();
+    }, 30 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [isRemoteClient, token, handleManualRefresh]);
+
   return (
     <div>
       {isRemoteClient ? (
@@ -157,7 +181,11 @@ function App() {
       ) : !token ? (
         <Login />
       ) : (
-        <Home token={token} onManualRefreshToken={handleManualRefresh} />
+        <Home
+          token={token}
+          onManualRefreshToken={handleManualRefresh}
+          onAuthFailure={handleAuthFailure}
+        />
       )}
     </div>
   );

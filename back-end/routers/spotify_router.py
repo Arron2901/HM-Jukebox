@@ -99,6 +99,7 @@ def refresh_token(service: SpotifyService = Depends(get_spotify_service)):
     refreshed = service.refresh_access_token()
     if not refreshed:
         return {"error": "No cached token to refresh"}
+    print("Spotify token refreshed; expires_in:", refreshed["expires_in"])
     return {
         "access_token": refreshed["access_token"],
         "expires_in": refreshed["expires_in"],

@@ -35,6 +35,10 @@ export default function SpotifyPlayer({
         console.log("Spotify player already initialized, skipping re-init");
         return;
       }
+      if (typeof window.Spotify === "undefined") {
+        console.warn("Spotify SDK not ready yet; deferring initialization");
+        return;
+      }
 
       console.log("Initializing Spotify Web Playback SDK");
       const playerInstance = new Spotify.Player({
