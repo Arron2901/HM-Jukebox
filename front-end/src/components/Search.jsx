@@ -66,6 +66,8 @@ export default function Search({
   externalResults,
   externalLoading,
   onClearExternalResults,
+  showPlaylists = true,
+  enableKeyboard = true,
 }) {
   const [query, setQuery] = useState("");
   const [tracks, setTracks] = useState([]);
@@ -106,7 +108,9 @@ export default function Search({
       console.error("Search failed", error);
     } finally {
       setIsSearching(false);
-      setShowKeyboard(false);
+      if (enableKeyboard) {
+        setShowKeyboard(false);
+      }
     }
   };
 
@@ -152,8 +156,9 @@ export default function Search({
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for a song..."
             className="search-input"
-            onFocus={() => setShowKeyboard(true)}
+            onFocus={() => enableKeyboard && setShowKeyboard(true)}
             onBlur={(e) => {
+              if (!enableKeyboard) return;
               if (!e.relatedTarget || !e.relatedTarget.classList.contains("vk-key")) {
                 setShowKeyboard(false);
               }
@@ -186,11 +191,11 @@ export default function Search({
             ))}
           </ul>
         )}
-        {showKeyboard && <VirtualKeyboard onKeyPress={handleKeyboardInput} />}
+        {enableKeyboard && showKeyboard && <VirtualKeyboard onKeyPress={handleKeyboardInput} />}
       </section>
 
       {/* Curated playlists behave like pre-filled searches to encourage discovery. */}
-      {playlistSections.map((section) => (
+      {showPlaylists && playlistSections.map((section) => (
         <section key={section.id} className="playlist-section">
           <h3 className="playlist-heading">{section.heading}</h3>
           <div className="playlist-grid">

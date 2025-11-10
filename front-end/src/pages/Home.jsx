@@ -6,6 +6,7 @@ import Playback from "../components/Playback";
 import Navbar from "../components/Navbar";
 import AdminOverlay from "../components/AdminOverlay";
 import "../App.css";
+import { fetchRemoteQueue as fetchRemoteQueueAPI, deleteRemoteQueueItem } from "../api/spotifyAPI";
 
 import "@fontsource/roboto-mono";
 import "@fontsource/roboto-mono/400.css";
@@ -31,6 +32,15 @@ const mapSpotifyItem = (item) => {
 
 // Search results from the backend already contain simplified metadata; rename fields for consistency.
 const mapSearchTrack = (track) => ({
+  id: track.uri,
+  uri: track.uri,
+  name: track.name,
+  artists: track.artist,
+  albumArt: track.album_art_url,
+  duration_ms: track.duration_ms,
+});
+
+const mapRemoteQueuedTrack = (track) => ({
   id: track.uri,
   uri: track.uri,
   name: track.name,
@@ -83,6 +93,7 @@ export default function Home({ token, onManualRefreshToken }) {
   const advanceTimerRef = useRef(null);
   const pollSuppressUntilRef = useRef(0);
   const pauseRequestedRef = useRef(false);
+  const remoteQueueProcessingRef = useRef(false);
 
   // When the current track changes we allow auto-advance to trigger again.
   useEffect(() => {
@@ -453,17 +464,25 @@ export default function Home({ token, onManualRefreshToken }) {
   }, []);
 
   // Adds user picks to the queue and removes duplicates from fallback order.
+  const enqueueUserTrack = useCallback(
+    (normalized) => {
+      if (!normalized?.uri) return;
+      const alreadyQueued = userQueueRef.current.some((item) => item.uri === normalized.uri);
+      if (alreadyQueued) return;
+      userQueueRef.current = [...userQueueRef.current, normalized];
+      setUserQueue((prev) => [...prev, normalized]);
+      setFallbackQueue((prev) => prev.filter((item) => item.uri !== normalized.uri));
+    },
+    [userQueueRef]
+  );
+
   const handleAddTrack = useCallback(
     (track) => {
       if (!track?.uri) return;
       const normalized = mapSearchTrack(track);
-
-      userQueueRef.current = [...userQueueRef.current, normalized];
-      setUserQueue((prev) => [...prev, normalized]);
-
-      setFallbackQueue((prev) => prev.filter((item) => item.uri !== normalized.uri));
+      enqueueUserTrack(normalized);
     },
-    [userQueueRef]
+    [enqueueUserTrack]
   );
 
   // Clicking a curated playlist fetches a sample and injects it into the search results pane.
@@ -529,6 +548,28 @@ export default function Home({ token, onManualRefreshToken }) {
       console.error("Failed to activate player element", error);
     }
   }, []);
+
+  const processRemoteQueue = useCallback(async () => {
+    if (remoteQueueProcessingRef.current) return;
+    remoteQueueProcessingRef.current = true;
+    try {
+      const items = await fetchRemoteQueueAPI();
+      if (!Array.isArray(items) || !items.length) return;
+      for (const item of items) {
+        enqueueUserTrack(mapRemoteQueuedTrack(item));
+        await deleteRemoteQueueItem(item.id);
+      }
+    } catch (error) {
+      console.error("Failed to process remote queue", error);
+    } finally {
+      remoteQueueProcessingRef.current = false;
+    }
+  }, [enqueueUserTrack]);
+
+  useEffect(() => {
+    const interval = setInterval(processRemoteQueue, 3000);
+    return () => clearInterval(interval);
+  }, [processRemoteQueue]);
 
   return (
     <div>

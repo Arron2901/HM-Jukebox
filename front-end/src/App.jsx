@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import Login from "./pages/Login";
 import Home from "./pages/home";
+import Remote from "./pages/Remote";
 import { BACKEND_URL } from "./api/spotifyAPI";
 
 /**
@@ -10,6 +11,7 @@ import { BACKEND_URL } from "./api/spotifyAPI";
 function App() {
   // token: current Spotify access token; refreshTimeout keeps handle to the scheduled refresh.
   const [token, setToken] = useState(null);
+  const [isRemoteClient, setIsRemoteClient] = useState(false);
   const refreshTimeout = useRef(null);
 
   /**
@@ -60,6 +62,10 @@ function App() {
   }, [refreshAccessToken, scheduleRefresh]);
 
   useEffect(() => {
+    const remote = window.location.pathname.startsWith("/remote");
+    setIsRemoteClient(remote);
+    if (remote) return;
+
     // Parse the auth callback parameters immediately after login.
     const params = new URLSearchParams(window.location.search);
     const accessToken = params.get("access_token");
@@ -75,7 +81,9 @@ function App() {
 
   return (
     <div>
-      {!token ? (
+      {isRemoteClient ? (
+        <Remote />
+      ) : !token ? (
         <Login />
       ) : (
         <Home token={token} onManualRefreshToken={handleManualRefresh} />

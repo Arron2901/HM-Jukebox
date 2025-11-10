@@ -45,6 +45,47 @@
   min-height: 0;
 }
 
+.remote-page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: left;
+}
+
+.remote-header h1 {
+  margin-bottom: 8px;
+}
+
+.remote-status {
+  color: #0f8bff;
+  font-weight: 600;
+}
+
+.remote-pending {
+  margin-top: 24px;
+}
+
+.remote-pending ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.remote-pending li {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(15, 15, 15, 0.1);
+}
+
+.remote-pending strong {
+  display: block;
+}
+
+.remote-empty {
+  color: rgba(15, 15, 15, 0.6);
+}
+
 
 
 @media (max-width: 1000px) {

@@ -3,13 +3,18 @@ from fastapi.responses import RedirectResponse
 from services.spotifyService import SpotifyService
 from core.dependencies import get_spotify_service
 from schemas.track_schema import TrackSchema
+from schemas.remote_track_schema import RemoteTrackPayload, RemoteQueuedTrack
 import spotipy
+from uuid import uuid4
+from typing import List
 
 # All Spotify-related HTTP endpoints live under this router.
 router = APIRouter(
     prefix="/spotify",
     tags=["Spotify"]
 )
+
+remote_add_queue: List[RemoteQueuedTrack] = []
 
 
 # Search Router
@@ -100,3 +105,27 @@ def refresh_token(service: SpotifyService = Depends(get_spotify_service)):
         "scope": refreshed["scope"],
         "token_type": refreshed["token_type"],
     }
+
+
+@router.post("/remote-queue", response_model=RemoteQueuedTrack)
+def enqueue_remote_track(payload: RemoteTrackPayload):
+    """
+    Accepts track metadata from remote devices so the kiosk can enqueue them locally.
+    """
+    item = RemoteQueuedTrack(id=str(uuid4()), **payload.dict())
+    remote_add_queue.append(item)
+    return item
+
+
+@router.get("/remote-queue", response_model=list[RemoteQueuedTrack])
+def list_remote_queue():
+    return remote_add_queue
+
+
+@router.delete("/remote-queue/{item_id}")
+def delete_remote_track(item_id: str):
+    for index, item in enumerate(remote_add_queue):
+        if item.id == item_id:
+            remote_add_queue.pop(index)
+            return {"message": "Removed"}
+    return {"error": "Not found"}
