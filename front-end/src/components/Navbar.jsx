@@ -29,7 +29,7 @@ const Navbar = ({ onAdminTrigger }) => {
   return (
     <nav className="navbar">
       <div className="navbar-section navbar-left">
-        <h1 className="navbar-title">The Headless Mouse Jukebox 1</h1>
+        <h1 className="navbar-title">The Headless Mouse Jukebox</h1>
       </div>
       <div className="navbar-section navbar-right">
         {remoteUrl && (
