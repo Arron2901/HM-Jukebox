@@ -40,6 +40,7 @@ export default function Search({
     onClearExternalResults?.();
     setShowingExternal(false);
     setTracks([]);
+    setQuery("");
   };
 
   const handleSearch = async (e) => {
