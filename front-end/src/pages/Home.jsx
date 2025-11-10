@@ -146,6 +146,7 @@ export default function Home({ token, onManualRefreshToken, onAuthFailure }) {
   const [externalSearch, setExternalSearch] = useState(null);
   const [playlistLoading, setPlaylistLoading] = useState(false);
   const [playlistCovers, setPlaylistCovers] = useState({});
+  const [fallbackLoaded, setFallbackLoaded] = useState(false);
 
   const curatedSections = useMemo(() => basePlaylistConfig(), []);
 
@@ -169,7 +170,7 @@ export default function Home({ token, onManualRefreshToken, onAuthFailure }) {
 
   // Pulls ~1000 tracks from the fallback playlist and shuffles them for variety.
   const fetchFallbackPlaylist = useCallback(async () => {
-    if (!token) return;
+    if (!token) return false;
 
     const tracks = [];
     let offset = 0;
@@ -200,14 +201,23 @@ export default function Home({ token, onManualRefreshToken, onAuthFailure }) {
       const shuffled = tracks.slice(0, 2000).sort(() => Math.random() - 0.5);
       setFallbackQueue(shuffled);
       setFallbackIndex(0);
+      return true;
     } catch (error) {
       console.error("Failed to load fallback playlist", error);
+      return false;
     }
   }, [token]);
 
   useEffect(() => {
-    fetchFallbackPlaylist();
-  }, [fetchFallbackPlaylist]);
+    if (!token || fallbackLoaded) return;
+    const load = async () => {
+      const success = await fetchFallbackPlaylist();
+      if (success) {
+        setFallbackLoaded(true);
+      }
+    };
+    load();
+  }, [token, fallbackLoaded, fetchFallbackPlaylist]);
 
   useEffect(() => {
     if (!token) return;
