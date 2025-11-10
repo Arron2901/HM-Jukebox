@@ -57,6 +57,7 @@ BACKEND_PID=$!
 echo "Starting frontend..."
 (
   cd "${ROOT_DIR}/front-end"
+  npm install
   npm run dev -- --host 0.0.0.0 --port "${FRONTEND_PORT}"
 ) &
 FRONTEND_PID=$!
