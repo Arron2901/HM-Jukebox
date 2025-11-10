@@ -551,8 +551,23 @@ export default function Home({ token, onManualRefreshToken }) {
         }
         await syncPlaybackState();
         if (cancelled) return;
-        const remaining = (trackProgressRef.current.duration || 0) - (trackProgressRef.current.position || 0);
-        const nextDelay = remaining <= 3000 ? 300 : 1000;
+
+        const duration = trackProgressRef.current.duration || 0;
+        const position = trackProgressRef.current.position || 0;
+        const remaining = Math.max(0, duration - position);
+
+        let nextDelay = 1000;
+        if (duration > 0) {
+          const progressRatio = position / duration;
+          if (progressRatio < 0.5) {
+            nextDelay = 2000; // Slow polling for the first half of the track.
+          } else if (remaining <= 1000) {
+            nextDelay = 200; // Final sprint: extra tight polling in the last second.
+          } else {
+            nextDelay = 1000; // Standard 1s cadence for the back half.
+          }
+        }
+
         schedulePoll(nextDelay);
       }, delay);
     };
