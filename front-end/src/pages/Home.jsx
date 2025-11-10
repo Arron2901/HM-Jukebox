@@ -98,7 +98,7 @@ export default function Home({ token, onManualRefreshToken }) {
     const limit = 100;
 
     try {
-      while (tracks.length < 1000) {
+      while (tracks.length < 2000) {
         const response = await fetch(
           `https://api.spotify.com/v1/playlists/${FALLBACK_PLAYLIST_ID}/tracks?limit=${limit}&offset=${offset}`,
           {
@@ -119,7 +119,7 @@ export default function Home({ token, onManualRefreshToken }) {
         if (!data.next) break;
         offset += limit;
       }
-      const shuffled = tracks.slice(0, 1000).sort(() => Math.random() - 0.5);
+      const shuffled = tracks.slice(0, 2000).sort(() => Math.random() - 0.5);
       setFallbackQueue(shuffled);
       setFallbackIndex(0);
     } catch (error) {
