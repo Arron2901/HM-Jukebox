@@ -77,5 +77,5 @@ If it can’t detect a LAN IP, the `/remote` route is disabled and no QR code is
 
 ## To‑Do
 
-- [ ] Add a reliable QR code/dynamic URL display so guests can scan a LAN-friendly link to `/remote`.
+- [X] Add a reliable QR code/dynamic URL display so guests can scan a LAN-friendly link to `/remote`.
 - [ ] Expose the current playback queue via the backend so remote clients can see “Up Next”.
