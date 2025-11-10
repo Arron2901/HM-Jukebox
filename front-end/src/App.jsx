@@ -172,6 +172,14 @@ function App() {
   }, [ensureFreshToken]);
 
   useEffect(() => {
+    const disableContextMenu = (event) => {
+      event.preventDefault();
+    };
+    document.addEventListener("contextmenu", disableContextMenu);
+    return () => document.removeEventListener("contextmenu", disableContextMenu);
+  }, []);
+
+  useEffect(() => {
     if (!token) return;
     console.log("[Auth] Frontend now using access token (truncated):", `${token.slice(0, 10)}...`);
   }, [token]);
