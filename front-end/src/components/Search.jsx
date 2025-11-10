@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { searchTracks } from "../api/spotifyAPI";
+import VirtualKeyboard from "./VirtualKeyboard";
 import "../styles/Search.css";
 
 const playlistSections = [
@@ -65,6 +66,7 @@ export default function Search({
   const [tracks, setTracks] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showingExternal, setShowingExternal] = useState(false);
+  const [showKeyboard, setShowKeyboard] = useState(false);
 
   useEffect(() => {
     if (externalResults && externalResults.length) {
@@ -97,6 +99,7 @@ export default function Search({
       console.error("Search failed", error);
     } finally {
       setIsSearching(false);
+      setShowKeyboard(false);
     }
   };
 
@@ -105,6 +108,28 @@ export default function Search({
     setTracks([]);
     setQuery("");
     clearExternal();
+  };
+
+  const handleKeyboardInput = (key) => {
+    if (key === "Backspace") {
+      setQuery((prev) => prev.slice(0, -1));
+      return;
+    }
+    if (key === "Clear") {
+      setQuery("");
+      setTracks([]);
+      clearExternal();
+      return;
+    }
+    if (key === "Space") {
+      setQuery((prev) => prev + " ");
+      return;
+    }
+    if (key === "Enter") {
+      handleSearch(new Event("submit"));
+      return;
+    }
+    setQuery((prev) => `${prev}${key}`);
   };
 
   return (
@@ -118,6 +143,12 @@ export default function Search({
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for a song..."
             className="search-input"
+            onFocus={() => setShowKeyboard(true)}
+            onBlur={(e) => {
+              if (!e.relatedTarget || !e.relatedTarget.classList.contains("vk-key")) {
+                setShowKeyboard(false);
+              }
+            }}
           />
           <button type="submit" className="search-button">
             GO
@@ -146,6 +177,7 @@ export default function Search({
             ))}
           </ul>
         )}
+        {showKeyboard && <VirtualKeyboard onKeyPress={handleKeyboardInput} />}
       </section>
 
       {playlistSections.map((section) => (
