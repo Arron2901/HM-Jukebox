@@ -74,6 +74,12 @@
   box-shadow: 0 6px 10px rgba(21, 21, 21, 0.25);
 }
 
+.admin-advanced-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .admin-close {
   width: 120px;
   margin: 12px auto 0;

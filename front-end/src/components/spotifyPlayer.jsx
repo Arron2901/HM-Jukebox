@@ -1,5 +1,10 @@
 import { useEffect, useRef } from "react";
 
+/**
+ * Thin wrapper around the Spotify Web Playback SDK.
+ * Creates the player once, wires up logging for every lifecycle event,
+ * and surfaces key callbacks so the Home screen can react to state changes.
+ */
 export default function SpotifyPlayer({
   token,
   onReady,
@@ -9,6 +14,7 @@ export default function SpotifyPlayer({
   const playerRef = useRef(null);
   const scriptLoadedRef = useRef(false);
 
+  // Track mount/unmount so we can see if the player ever gets torn down unexpectedly.
   useEffect(() => {
     console.log("SpotifyPlayer component mounted");
     return () => {
@@ -38,6 +44,7 @@ export default function SpotifyPlayer({
       });
       playerRef.current = playerInstance;
 
+      // Mirror every SDK error to the console for faster debugging in the kiosk.
       ["initialization_error", "authentication_error", "account_error", "playback_error"].forEach(
         (event) => {
           playerInstance.addListener(event, ({ message }) => {
@@ -71,6 +78,7 @@ export default function SpotifyPlayer({
       });
     };
 
+    // Load the SDK script once and reuse it across subsequent mounts.
     if (!scriptLoadedRef.current) {
       const existingScript = document.querySelector(
         "script[src='https://sdk.scdn.co/spotify-player.js']"

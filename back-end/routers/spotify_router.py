@@ -5,6 +5,7 @@ from core.dependencies import get_spotify_service
 from schemas.track_schema import TrackSchema
 import spotipy
 
+# All Spotify-related HTTP endpoints live under this router.
 router = APIRouter(
     prefix="/spotify",
     tags=["Spotify"]
@@ -87,3 +88,15 @@ def spotify_login(service: SpotifyService = Depends(get_spotify_service)):
     auth_url = service.spotify_repo.sp_oauth.get_authorize_url()
     return RedirectResponse(auth_url)
 
+
+@router.post("/refresh-token")
+def refresh_token(service: SpotifyService = Depends(get_spotify_service)):
+    refreshed = service.refresh_access_token()
+    if not refreshed:
+        return {"error": "No cached token to refresh"}
+    return {
+        "access_token": refreshed["access_token"],
+        "expires_in": refreshed["expires_in"],
+        "scope": refreshed["scope"],
+        "token_type": refreshed["token_type"],
+    }

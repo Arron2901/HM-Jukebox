@@ -12,8 +12,10 @@ import "@fontsource/roboto-mono/400.css";
 import "@fontsource/roboto-mono/700.css";
 import "@fontsource/roboto-mono/400-italic.css";
 
+// Hard-coded safety net playlist to keep music running when the queue is empty.
 const FALLBACK_PLAYLIST_ID = "6koaBLo3EPH96TlQkpWUxa";
 
+// Normalizes Spotify’s playlist-track payload into the shape our UI expects.
 const mapSpotifyItem = (item) => {
   const track = item?.track;
   if (!track) return null;
@@ -27,6 +29,7 @@ const mapSpotifyItem = (item) => {
   };
 };
 
+// Search results from the backend already contain simplified metadata; rename fields for consistency.
 const mapSearchTrack = (track) => ({
   id: track.uri,
   uri: track.uri,
@@ -36,17 +39,26 @@ const mapSearchTrack = (track) => ({
   duration_ms: track.duration_ms,
 });
 
+// Custom hook that keeps a mutable ref in sync with state so async callbacks can read the latest value.
 const useSyncedRef = (value) => {
   const ref = useRef(value);
+  // Once the player is ready and we have fallback data, kick off the first track.
+  // Adaptive polling loop: check often near the end of a track, otherwise every second.
   useEffect(() => {
     ref.current = value;
   }, [value]);
   return ref;
 };
 
+// Convenience delay helper used to buffer Spotify API calls.
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export default function Home({ token }) {
+/**
+ * Home orchestrates the entire kiosk experience: Spotify SDK setup, queue juggling,
+ * playback polling, admin controls, and the main search/playback layout.
+ */
+export default function Home({ token, onManualRefreshToken }) {
+  // Core playback/session state
   const [deviceId, setDeviceId] = useState(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [fallbackQueue, setFallbackQueue] = useState([]);
@@ -60,6 +72,7 @@ export default function Home({ token }) {
   const [externalSearch, setExternalSearch] = useState(null);
   const [playlistLoading, setPlaylistLoading] = useState(false);
 
+  // Mirror select state in refs so long-running callbacks can read latest values without stale closures.
   const fallbackQueueRef = useSyncedRef(fallbackQueue);
   const fallbackIndexRef = useSyncedRef(fallbackIndex);
   const userQueueRef = useSyncedRef(userQueue);
@@ -71,10 +84,12 @@ export default function Home({ token }) {
   const pollSuppressUntilRef = useRef(0);
   const pauseRequestedRef = useRef(false);
 
+  // When the current track changes we allow auto-advance to trigger again.
   useEffect(() => {
     endTriggeredRef.current = false;
   }, [currentTrack?.uri]);
 
+  // Pulls ~1000 tracks from the fallback playlist and shuffles them for variety.
   const fetchFallbackPlaylist = useCallback(async () => {
     if (!token) return;
 
@@ -116,6 +131,7 @@ export default function Home({ token }) {
     fetchFallbackPlaylist();
   }, [fetchFallbackPlaylist]);
 
+  // Ensures the Web Playback SDK device becomes the active Spotify target.
   const transferPlayback = useCallback(
     async (targetDeviceId) => {
       if (!token || !targetDeviceId) return false;
@@ -145,6 +161,7 @@ export default function Home({ token }) {
     [token]
   );
 
+  // Helpful debug hook to see when the SDK device vanishes or reappears.
   const logAvailableDevices = useCallback(async () => {
     if (!token) return;
     try {
@@ -160,6 +177,7 @@ export default function Home({ token }) {
     }
   }, [token]);
 
+  // Single entry point to begin playback and reset all timing refs.
   const startTrack = useCallback(
     async (track) => {
       if (!track || !deviceId || !token) return;
@@ -193,6 +211,7 @@ export default function Home({ token }) {
     [deviceId, token]
   );
 
+  // Pops the next track (prefer user queue, then fallback list).
   const getNextTrack = useCallback(() => {
     if (userQueueRef.current.length > 0) {
       const [next, ...rest] = userQueueRef.current;
@@ -221,6 +240,7 @@ export default function Home({ token }) {
     }
   }, [getNextTrack, startTrack]);
 
+  // Watches progress for “nearly done” tracks and schedules the next one.
   const maybeTriggerAdvance = useCallback(
     (isPlayingState, position, duration) => {
       if (!duration || duration <= 0) return;
@@ -250,6 +270,7 @@ export default function Home({ token }) {
     }
   }, [deviceId, playerReady, fallbackQueue.length, currentTrack, playNext]);
 
+  // When the SDK reports ready, transfer playback and mark the device as ready.
   const handlePlayerReady = useCallback(
     async ({ deviceId }) => {
       console.log("handlePlayerReady", deviceId);
@@ -263,6 +284,7 @@ export default function Home({ token }) {
     [logAvailableDevices, transferPlayback]
   );
 
+  // Shared Spotify Web API helper that injects auth + device headers.
   const sendPlaybackRequest = useCallback(
     async (url, options = {}) => {
       if (!token || !deviceId) {
@@ -288,6 +310,7 @@ export default function Home({ token }) {
     [token, deviceId]
   );
 
+  // Admin controls
   const handleAdminPlayPause = useCallback(() => {
     if (isPlaying) {
       pauseRequestedRef.current = true;
@@ -297,6 +320,7 @@ export default function Home({ token }) {
       });
     } else {
       pauseRequestedRef.current = false;
+      pollSuppressUntilRef.current = Date.now() + 1000;
       sendPlaybackRequest(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
         method: "PUT",
         body: JSON.stringify({}),
@@ -305,6 +329,7 @@ export default function Home({ token }) {
   }, [deviceId, isPlaying, sendPlaybackRequest]);
 
   const handleAdminNext = useCallback(() => {
+    pollSuppressUntilRef.current = Date.now() + 1000;
     playNext();
   }, [playNext]);
 
@@ -317,6 +342,7 @@ export default function Home({ token }) {
   const handleAdminVolumeChange = useCallback(
     (value) => {
       setVolumePercent(value);
+      pollSuppressUntilRef.current = Date.now() + 500;
       sendPlaybackRequest(
         `https://api.spotify.com/v1/me/player/volume?volume_percent=${value}&device_id=${deviceId}`,
         { method: "PUT" }
@@ -325,6 +351,7 @@ export default function Home({ token }) {
     [deviceId, sendPlaybackRequest]
   );
 
+  // SDK push events keep us in sync between polls and catch manual actions.
   const handlePlayerStateChange = useCallback(
     (state) => {
       if (!state) return;
@@ -353,6 +380,7 @@ export default function Home({ token }) {
     [currentTrackRef, maybeTriggerAdvance]
   );
 
+  // Polling fallback so we don't rely solely on player_state_changed events.
   const syncPlaybackState = useCallback(async () => {
     if (!token) return;
     if (Date.now() < pollSuppressUntilRef.current) return;
@@ -416,6 +444,7 @@ export default function Home({ token }) {
     };
   }, [token, playerReady, syncPlaybackState, trackProgressRef]);
 
+  // Ensure delayed auto-advance timers never fire after unmount.
   useEffect(() => () => {
     if (advanceTimerRef.current) {
       clearTimeout(advanceTimerRef.current);
@@ -423,6 +452,7 @@ export default function Home({ token }) {
     }
   }, []);
 
+  // Adds user picks to the queue and removes duplicates from fallback order.
   const handleAddTrack = useCallback(
     (track) => {
       if (!track?.uri) return;
@@ -436,6 +466,7 @@ export default function Home({ token }) {
     [userQueueRef]
   );
 
+  // Clicking a curated playlist fetches a sample and injects it into the search results pane.
   const handlePlaylistSelect = useCallback(
     async (playlistId, title) => {
       if (!token || !playlistId) return;
@@ -480,6 +511,7 @@ export default function Home({ token }) {
     setExternalSearch(null);
   }, []);
 
+  // Compose the “Up Next” list by prioritizing user tracks and filling the rest with fallback picks.
   const upcomingQueue = useMemo(() => {
     const userUris = new Set(userQueue.map((track) => track.uri));
     const fallbackStart = fallbackQueue
@@ -488,6 +520,7 @@ export default function Home({ token }) {
     return [...userQueue, ...fallbackStart];
   }, [userQueue, fallbackQueue, fallbackIndex]);
 
+  // Safari/iOS require a user gesture; this helper keeps the SDK happy when requested.
   const activatePlayerElement = useCallback(async (player) => {
     try {
       await player.activateElement();
@@ -522,10 +555,12 @@ export default function Home({ token }) {
               onPrev={handleAdminPrev}
               onNext={handleAdminNext}
               onVolumeChange={handleAdminVolumeChange}
+              onRefreshToken={onManualRefreshToken}
             />
           )}
         </div>
       </main>
+      {/* Keep the Spotify Web Playback SDK mounted at all times so the device stays active. */}
       <SpotifyPlayer
         token={token}
         onReady={handlePlayerReady}

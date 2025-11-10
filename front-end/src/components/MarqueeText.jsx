@@ -12,6 +12,7 @@ const MarqueeText = ({ as: Component = "div", className = "", children }) => {
     const el = textRef.current;
     if (!el) return;
 
+    // Recalculate whenever size or content changes so we only animate when needed.
     const updateOverflow = () => {
       const overflowAmount = el.scrollWidth - el.clientWidth;
       if (overflowAmount > 2) {

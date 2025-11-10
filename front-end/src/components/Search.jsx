@@ -3,6 +3,7 @@ import { searchTracks } from "../api/spotifyAPI";
 import VirtualKeyboard from "./VirtualKeyboard";
 import "../styles/Search.css";
 
+// Predefined playlist blocks shown below the search panel.
 const playlistSections = [
   {
     id: "eras",
@@ -54,6 +55,10 @@ const playlistSections = [
   },
 ];
 
+/**
+ * Search lets users type (or tap via the virtual keyboard), preview results,
+ * and feed both ad-hoc searches and curated playlist picks into the queue.
+ */
 export default function Search({
   onAddTrack,
   onPlaylistSelect,
@@ -69,6 +74,7 @@ export default function Search({
   const [showKeyboard, setShowKeyboard] = useState(false);
 
   useEffect(() => {
+    // When Home injects playlist selections, reflect that in the input/results.
     if (externalResults && externalResults.length) {
       setQuery(externalQuery || "");
       setTracks(externalResults);
@@ -83,12 +89,13 @@ export default function Search({
   }, [externalResults]);
 
   const clearExternal = () => {
+    // Reset playlist-driven state so manual search feels clean.
     onClearExternalResults?.();
     setShowingExternal(false);
   };
 
   const handleSearch = async (e) => {
-    e.preventDefault();
+    e.preventDefault?.();
     if (!query) return;
     clearExternal();
     try {
@@ -103,6 +110,7 @@ export default function Search({
     }
   };
 
+  // Feed the selected track back to Home and reset the UI for the next person.
   const handleAdd = (track) => {
     onAddTrack?.(track);
     setTracks([]);
@@ -110,6 +118,7 @@ export default function Search({
     clearExternal();
   };
 
+  // Map physical keyboard-like inputs to the search box.
   const handleKeyboardInput = (key) => {
     if (key === "Backspace") {
       setQuery((prev) => prev.slice(0, -1));
@@ -126,7 +135,7 @@ export default function Search({
       return;
     }
     if (key === "Enter") {
-      handleSearch(new Event("submit"));
+      handleSearch({ preventDefault: () => {} });
       return;
     }
     setQuery((prev) => `${prev}${key}`);
@@ -180,6 +189,7 @@ export default function Search({
         {showKeyboard && <VirtualKeyboard onKeyPress={handleKeyboardInput} />}
       </section>
 
+      {/* Curated playlists behave like pre-filled searches to encourage discovery. */}
       {playlistSections.map((section) => (
         <section key={section.id} className="playlist-section">
           <h3 className="playlist-heading">{section.heading}</h3>

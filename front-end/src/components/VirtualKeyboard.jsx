@@ -1,6 +1,7 @@
 import React from "react";
 import "../styles/VirtualKeyboard.css";
 
+// QWERTY-inspired keyboard layout, sized for the on-screen kiosk.
 const LAYOUT = [
   ["1","2","3","4","5","6","7","8","9","0"],
   ["Q","W","E","R","T","Y","U","I","O","P"],
@@ -8,6 +9,10 @@ const LAYOUT = [
   ["Z","X","C","V","B","N","M"],
 ];
 
+/**
+ * VirtualKeyboard sends high-level key events (letters, Space, Backspace, etc.)
+ * back to the Search component so kiosk users can type without hardware input.
+ */
 export default function VirtualKeyboard({ onKeyPress }) {
   const handleClick = (value) => {
     onKeyPress?.(value);

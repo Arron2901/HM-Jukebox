@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from routers import spotify_router
 from fastapi.middleware.cors import CORSMiddleware
 
+# Primary FastAPI app that wires in the Spotify router and kiosk-specific CORS rules.
 app = FastAPI(title="HM Jukebox")
 
 origins = [
@@ -17,4 +18,5 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+# Route registrations live in routers.spotify_router to keep main clean.
 app.include_router(spotify_router.router)

@@ -2,6 +2,7 @@ import React from "react";
 import MarqueeText from "./MarqueeText";
 import "../styles/Playback.css";
 
+// Converts a track duration in ms into m:ss for the UI timer badge.
 const formatDuration = (ms = 0) => {
   if (!ms && ms !== 0) return "0:00";
   const totalSeconds = Math.floor(ms / 1000);
@@ -12,6 +13,9 @@ const formatDuration = (ms = 0) => {
 
 const placeholderImage = "https://i.scdn.co/image/ab67616d0000b2735bde2cf3db31145f11ffc045";
 
+/**
+ * Playback renders the large “Now Playing” card plus a peek at the next five queue items.
+ */
 export default function Playback({ currentTrack, queue = [], progress }) {
   const nextItems = queue.slice(0, 5);
   const position = progress?.position ?? 0;

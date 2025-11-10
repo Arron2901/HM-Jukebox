@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 
 class TrackSchema(BaseModel):
+    """API contract for tracks returned to the frontend."""
+
     name: str
     artist: str
     uri: str

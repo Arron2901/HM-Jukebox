@@ -1,6 +1,10 @@
 import React from 'react';
 import '../styles/AnimatedBackground.css';
 
+/**
+ * Lightweight decorative layer used on the landing page.
+ * Static emoji are positioned + animated via CSS so nothing in here re-renders.
+ */
 const AnimatedBackground = () => {
   return (
     <div className="notes-background">

@@ -1,3 +1,5 @@
+"""Shared FastAPI dependency providers so everything uses the same Spotify client."""
+
 from repositories.spotifyRepository import SpotifyRepository
 from services.spotifyService import SpotifyService
 from core.config import settings

@@ -1,3 +1,5 @@
+"""Domain model for music tracks used across both backend + frontend."""
+
 from dataclasses import dataclass
 from typing import Optional
 

@@ -1,7 +1,10 @@
 import React from "react";
 import "../styles/AdminOverlay.css";
 
-/** Simple right-side overlay for future admin controls. */
+/**
+ * Slide-in admin menu that exposes playback controls, volume, and maintenance tasks.
+ * Designed for the kiosk’s secret long-press gesture on the logo.
+ */
 const AdminOverlay = ({
   onClose,
   isPlaying,
@@ -10,6 +13,7 @@ const AdminOverlay = ({
   onPrev,
   onNext,
   onVolumeChange,
+  onRefreshToken,
 }) => {
 
   return (
@@ -43,7 +47,12 @@ const AdminOverlay = ({
 
         <section className="admin-section">
           <h3>Advanced Control</h3>
-          <button type="button" className="admin-accent">Git Pull</button>
+          <div className="admin-advanced-buttons">
+            <button type="button" className="admin-accent">Git Pull</button>
+            <button type="button" className="admin-accent" onClick={onRefreshToken}>
+              Refresh Spotify Token
+            </button>
+          </div>
         </section>
 
         <button type="button" className="admin-close" onClick={onClose}>

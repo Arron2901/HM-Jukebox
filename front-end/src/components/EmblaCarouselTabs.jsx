@@ -3,6 +3,10 @@ import useEmblaCarousel from 'embla-carousel-react'
 import { Thumb } from './EmblaCarouselThumbsButton'
 import "../styles/EmblaStyles/embla.css"
 
+/**
+ * EmblaCarouselTabs pairs a hero carousel with synced thumbnails.
+ * We keep track of the selected slide manually so both instances stay in lockstep.
+ */
 const EmblaCarouselTabs = (props) => {
   const { slides, options } = props
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -12,6 +16,7 @@ const EmblaCarouselTabs = (props) => {
     dragFree: true
   })
 
+  // Clicking a thumb scrolls the main carousel to the corresponding snap point.
   const onThumbClick = useCallback(
     (index) => {
       if (!emblaMainApi || !emblaThumbsApi) return
@@ -20,6 +25,7 @@ const EmblaCarouselTabs = (props) => {
     [emblaMainApi, emblaThumbsApi]
   )
 
+  // Sync the active thumb whenever Embla reports a selection change or reInit.
   const onSelect = useCallback(() => {
     if (!emblaMainApi || !emblaThumbsApi) return
     setSelectedIndex(emblaMainApi.selectedScrollSnap())

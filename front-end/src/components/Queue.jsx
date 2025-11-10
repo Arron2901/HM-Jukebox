@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { fetchQueue, deleteFromQueue } from "../api/spotifyAPI"; 
-import "../styles/Queue.css"; // Make sure to use this CSS file
+import "../styles/Queue.css";
 
+// Helper so queue durations match the rest of the UI.
 const formatDuration = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -9,6 +10,10 @@ const formatDuration = (ms) => {
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
+/**
+ * Legacy Queue component (used in early prototypes) that lists every track.
+ * Still handy for debugging queue order or deletions outside the main playback card.
+ */
 export default function Queue() {
     const [queueTracks, setQueueTracks] = useState([]);
 

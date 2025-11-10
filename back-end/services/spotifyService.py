@@ -47,6 +47,12 @@ class SpotifyService:
         self.queue.clear()
         print("Queue cleared.")
 
+    def refresh_access_token(self):
+        """
+        Delegate to the repository so both layers share the same refresh flow.
+        """
+        return self.spotify_repo.refresh_access_token()
+
     # Get the currently playing track
     def get_current_track(self) -> Optional[Track]:
         """
