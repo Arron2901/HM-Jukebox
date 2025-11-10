@@ -4,6 +4,22 @@ import Home from "./pages/home";
 import Remote from "./pages/Remote";
 import { BACKEND_URL } from "./api/spotifyAPI";
 
+const sanitizeRemoteBase = (raw) => {
+  if (!raw) return "";
+  let trimmed = raw.trim();
+  if (!trimmed) return "";
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    trimmed = trimmed.slice(1, -1);
+  }
+  return trimmed.replace(/\/+$/, "");
+};
+
+const REMOTE_BASE_URL = sanitizeRemoteBase(import.meta.env.VITE_REMOTE_HOST);
+const REMOTE_ENABLED = Boolean(REMOTE_BASE_URL);
+
 /**
  * App bootstraps auth, keeps the browser token refreshed,
  * and switches between Login and the authenticated Home view.
@@ -64,7 +80,11 @@ function App() {
   useEffect(() => {
     const remote = window.location.pathname.startsWith("/remote");
     setIsRemoteClient(remote);
-    if (remote) return;
+    if (remote) {
+      return () => {
+        if (refreshTimeout.current) clearTimeout(refreshTimeout.current);
+      };
+    }
 
     // Parse the auth callback parameters immediately after login.
     const params = new URLSearchParams(window.location.search);
@@ -82,7 +102,16 @@ function App() {
   return (
     <div>
       {isRemoteClient ? (
-        <Remote />
+        REMOTE_ENABLED ? (
+          <Remote />
+        ) : (
+          <div className="remote-page">
+            <header className="remote-header">
+              <h1>Remote access disabled</h1>
+              <p>Ask the host to run the kiosk script so a LAN address can be shared.</p>
+            </header>
+          </div>
+        )
       ) : !token ? (
         <Login />
       ) : (

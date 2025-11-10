@@ -25,7 +25,7 @@
     height: clamp(280px, 70vh, 360px);
     border-radius: 32px;
     object-fit: cover;
-    box-shadow: 0 20px 35px rgba(15, 13, 33, 0.25);
+    box-shadow: 8px 8px 10px rgba(15, 13, 33, 0.25);
 }
 
 .now-playing-placeholder {
@@ -64,6 +64,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     width: 90%;
+    margin-left: 5px;
 }
 
 .now-playing-meta {
@@ -78,6 +79,7 @@
     font-size: 1rem;
     color: #050505;
     margin-left: auto;
+    width: 10vw;
 }
 
 .up-next-label {

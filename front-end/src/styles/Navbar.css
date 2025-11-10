@@ -14,15 +14,55 @@
     font-family: "Roboto Mono", sans-serif;
     font-size: clamp(2.4rem, 3vw, 3.2rem);
     font-weight: 700;
-    margin-top: 3vh;
-    margin-bottom: 0px;
-    text-align: left;
+    margin-top: 2.3vh;
+    margin-bottom: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.navbar-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.navbar-right {
+    align-items: center;
 }
 
 .navbar-logo {
     width: 96px;
     height: auto;
     filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.15));
+}
+
+.remote-qr-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+}
+
+.remote-qr-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: none;
+}
+
+.remote-qr-link {
+    font-size: 0.75rem;
+    color: #0f8bff;
+    text-decoration: none;
+    word-break: break-all;
+    max-width: 140px;
+    text-align: center;
+    display: none;
+}
+
+.remote-qr-link:hover {
+    text-decoration: underline;
 }
 
 @media (max-width: 800px) {
