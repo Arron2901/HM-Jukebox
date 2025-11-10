@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/AdminOverlay.css";
+import { git_pull } from "../api/spotifyAPI";
 
 /**
  * Slide-in admin menu that exposes playback controls, volume, and maintenance tasks.
@@ -15,6 +16,25 @@ const AdminOverlay = ({
   onVolumeChange,
   onRefreshToken,
 }) => {
+  
+  const [isPullingGit, setIsPullingGit] = useState(false)
+  const [gitUpdateMessage, setGitUpdateMessage] = useState("")
+
+  const handleGitPull = async () => {
+    setIsPullingGit(true)
+    setGitUpdateMessage("Pulling updates from Git...")
+
+    try {
+      const response = await git_pull()
+
+      setGitUpdateMessage(response.message + "\n\n" + response.git_output)
+    } catch (error) {
+      setGitUpdateMessage(`Error: ${error.message}`)
+    } finally {
+      setIsPullingGit(false)
+    }
+  }
+
   // Sends a signal to the helper extension so Chrome brings the AutoDarts tab forward (or opens it).
   const handleOpenAutodarts = () => {
     if (typeof window === "undefined") return;
@@ -27,7 +47,8 @@ const AdminOverlay = ({
   };
 
   return (
-    <aside className="admin-overlay">
+    <div className="modal-background" onClick={onClose}>
+    <div className="admin-overlay" onClick={(e) => e.stopPropagation()}>
       <div className="admin-panel">
         <h2>Admin Settings</h2>
 
@@ -58,7 +79,20 @@ const AdminOverlay = ({
         <section className="admin-section">
           <h3>Advanced Control</h3>
           <div className="admin-advanced-buttons">
-            <button type="button" className="admin-accent">Git Pull</button>
+            <button type="button" className="admin-accent" onClick={handleGitPull} disabled={isPullingGit}>{isPullingGit? "Pulling..." : "Git Pull"}</button>
+            {gitUpdateMessage && (
+              <pre style={{
+                marginTop: "15px",
+                textAlign: "left",
+                background: '#f4f4f4',
+                padding: "10px",
+                borderRadius: "8px",
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-all"
+              }}>
+                {gitUpdateMessage}
+              </pre>
+            )}
             <button type="button" className="admin-accent" onClick={onRefreshToken}>
               Refresh Spotify Token
             </button>
@@ -75,7 +109,8 @@ const AdminOverlay = ({
           Close
         </button>
       </div>
-    </aside>
+    </div>
+    </div>
   );
 };
 

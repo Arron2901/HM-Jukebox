@@ -96,7 +96,7 @@
     padding-right: 30px;
     margin-top: 16px;
     overflow-y: auto;
-    scrollbar-width: thin;
+    scrollbar-width: none;
     min-height: 0;
 }
 

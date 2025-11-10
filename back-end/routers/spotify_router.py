@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, HTTPException
 from fastapi.responses import RedirectResponse
 from services.spotifyService import SpotifyService
 from core.dependencies import get_spotify_service
@@ -7,6 +7,8 @@ from schemas.remote_track_schema import RemoteTrackPayload, RemoteQueuedTrack
 import spotipy
 from uuid import uuid4
 from typing import List
+import os
+import subprocess
 
 # All Spotify-related HTTP endpoints live under this router.
 router = APIRouter(
@@ -130,3 +132,39 @@ def delete_remote_track(item_id: str):
             remote_add_queue.pop(index)
             return {"message": "Removed"}
     return {"error": "Not found"}
+
+
+@router.get("/api/pull")
+def git_pull_and_reload() :
+    try:
+        # This new line goes up two extra levels
+        repo_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        
+        result = subprocess.run(
+            ['git', 'pull'],
+            check=True,
+            capture_output=True,
+            text=True,
+            cwd=repo_path
+        )
+
+        return {
+            "status" : "success",
+            "message" : "Git pull successful. App is reloading",
+            "git_ouput": result.stdout
+        }
+    
+    except subprocess.CalledProcessError as e:
+        print(f"Error during git pull: {e.stderr}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Git pull failed: {str(e)}"
+        )
+
+    except Exception as e:
+        print(f"An unexpected error occured: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"An unexpected error occured: {str(e)}"
+        )
+

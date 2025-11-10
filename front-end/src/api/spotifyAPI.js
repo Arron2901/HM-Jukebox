@@ -59,3 +59,8 @@ export async function deleteRemoteQueueItem(itemId) {
     }
     return res.json()
 }
+
+export async function git_pull() {
+    const res = await fetch(`${BACKEND_URL}/spotify/api/pull`)
+    return await res.json()
+}
