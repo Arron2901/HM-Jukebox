@@ -8,3 +8,4 @@ typing-extensions==4.12.2
 starlette==0.38.0
 httpx==0.27.0
 pytest==8.3.3
+unidecode==1.4.0
