@@ -437,6 +437,7 @@ export default function Home({ token, onManualRefreshToken, onAuthFailure }) {
   const handleAdminPlayPause = useCallback(() => {
     if (isPlaying) {
       pauseRequestedRef.current = true;
+      pollSuppressUntilRef.current = Number.POSITIVE_INFINITY;
       sendPlaybackRequest(`https://api.spotify.com/v1/me/player/pause?device_id=${deviceId}`, {
         method: "PUT",
         body: JSON.stringify({}),
@@ -545,17 +546,46 @@ export default function Home({ token, onManualRefreshToken, onAuthFailure }) {
     let timeoutId;
     let cancelled = false;
 
-    const schedulePoll = (delay) => {
-      timeoutId = setTimeout(async () => {
-        if (Date.now() < pollSuppressUntilRef.current) {
-          schedulePoll(500);
-          return;
-        }
-        await syncPlaybackState();
-        if (cancelled) return;
-
+      const ensureResume = () => {
+        if (pollSuppressUntilRef.current === Number.POSITIVE_INFINITY) return;
         const duration = trackProgressRef.current.duration || 0;
         const position = trackProgressRef.current.position || 0;
+        const remaining = Math.max(0, duration - position);
+
+        let nextDelay = 1000;
+        if (duration > 0) {
+          const progressRatio = position / duration;
+          if (progressRatio < 0.5) {
+            nextDelay = 2000;
+          } else if (remaining <= 1000) {
+            nextDelay = 200;
+          }
+        }
+
+        const previous = pollSuppressUntilRef.current;
+        pollSuppressUntilRef.current = Date.now() + nextDelay;
+        setTimeout(() => {
+          if (pollSuppressUntilRef.current === previous) {
+            pollSuppressUntilRef.current = Date.now();
+          }
+        }, nextDelay);
+      };
+
+      const schedulePoll = (delay) => {
+        timeoutId = setTimeout(async () => {
+          if (pollSuppressUntilRef.current === Number.POSITIVE_INFINITY) {
+            schedulePoll(1000);
+            return;
+          }
+          if (Date.now() < pollSuppressUntilRef.current) {
+            schedulePoll(500);
+            return;
+          }
+          await syncPlaybackState();
+          if (cancelled) return;
+
+          const duration = trackProgressRef.current.duration || 0;
+          const position = trackProgressRef.current.position || 0;
         const remaining = Math.max(0, duration - position);
 
         let nextDelay = 1000;
@@ -575,6 +605,7 @@ export default function Home({ token, onManualRefreshToken, onAuthFailure }) {
     };
 
     schedulePoll(0);
+    ensureResume();
 
     return () => {
       cancelled = true;
