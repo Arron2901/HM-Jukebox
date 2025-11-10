@@ -17,7 +17,7 @@ cleanup() {
 
 trap cleanup EXIT
 
-LAN_IP=$(python3 - <<'PY'
+LAN_IP=$(python - <<'PY'
 import socket
 try:
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -49,8 +49,8 @@ fi
 echo "Starting backend..."
 (
   cd "${ROOT_DIR}/back-end"
-  python3 -m pip install -r requirements.txt
-  python3 -m uvicorn main:app --host 0.0.0.0 --port "${BACKEND_PORT}"
+  python -m pip install -r requirements.txt
+  python -m uvicorn main:app --host 0.0.0.0 --port "${BACKEND_PORT}"
 ) &
 BACKEND_PID=$!
 
