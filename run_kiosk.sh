@@ -49,7 +49,7 @@ fi
 echo "Starting backend..."
 (
   cd "${ROOT_DIR}/back-end"
-  uvicorn back-end.main:app --host 0.0.0.0 --port "${BACKEND_PORT}"
+  python3 -m uvicorn main:app --host 0.0.0.0 --port "${BACKEND_PORT}"
 ) &
 BACKEND_PID=$!
 
