@@ -52,6 +52,7 @@
     white-space: nowrap;
     width: 90%;
     margin: 5px;
+    box-shadow: inset 5px 0 5px 5px rgb(190, 190, 190);
 }
 
 .now-playing-song-artists {

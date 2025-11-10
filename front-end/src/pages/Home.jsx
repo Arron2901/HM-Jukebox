@@ -782,7 +782,7 @@ export default function Home({ token, onManualRefreshToken, onAuthFailure }) {
       </main>
       {/* Keep the Spotify Web Playback SDK mounted at all times so the device stays active. */}
       <SpotifyPlayer
-        token={token}
+        // token={token}
         onReady={handlePlayerReady}
         onPlayerStateChange={handlePlayerStateChange}
         onActivateRequest={activatePlayerElement}

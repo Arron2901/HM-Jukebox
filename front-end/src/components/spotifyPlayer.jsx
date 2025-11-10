@@ -1,12 +1,35 @@
 import { useEffect, useRef } from "react";
+import { BACKEND_URL } from "../api/spotifyAPI";
+
+/**
+ * This function should live outside your component or in a separate utility file.
+ * It's responsible for contacting your server to get a *fresh* access token.
+ * Your server will use its stored refresh_token to make this request.
+ */
+async function getNewAccessToken() {
+  try {
+    // This is an API endpoint *you* must create on your own server.
+    const response = await fetch(`${BACKEND_URL}/spotify/refresh-token`, { method: "POST" }); 
+    
+    if (!response.ok) {
+      // If a refresh fails, you might need to force the user to log in again.
+      console.error('Could not refresh token. User may need to re-authenticate.');
+      throw new Error('Token refresh failed');
+    }
+
+    const data = await response.json();
+    return data.access_token; // Assumes your server returns { access_token: "..." }
+
+  } catch (error) {
+    console.error('Error fetching new access token:', error);
+  }
+}
 
 /**
  * Thin wrapper around the Spotify Web Playback SDK.
- * Creates the player once, wires up logging for every lifecycle event,
- * and surfaces key callbacks so the Home screen can react to state changes.
  */
 export default function SpotifyPlayer({
-  token,
+  // Notice: 'token' prop is REMOVED.
   onReady,
   onPlayerStateChange,
   onActivateRequest,
@@ -14,7 +37,7 @@ export default function SpotifyPlayer({
   const playerRef = useRef(null);
   const scriptLoadedRef = useRef(false);
 
-  // Track mount/unmount so we can see if the player ever gets torn down unexpectedly.
+  // Your mount/unmount effect is fine as-is.
   useEffect(() => {
     console.log("SpotifyPlayer component mounted");
     return () => {
@@ -27,9 +50,10 @@ export default function SpotifyPlayer({
     };
   }, []);
 
+  // This effect now only runs once on mount (or if callbacks change).
   useEffect(() => {
-    if (!token) return;
-
+    // We no longer check for a 'token' prop.
+    
     const initializePlayer = () => {
       if (playerRef.current) {
         console.log("Spotify player already initialized, skipping re-init");
@@ -43,12 +67,28 @@ export default function SpotifyPlayer({
       console.log("Initializing Spotify Web Playback SDK");
       const playerInstance = new Spotify.Player({
         name: "HM Jukebox",
-        getOAuthToken: (cb) => cb(token),
+        
+        // ===================================================================
+        // THE FIX:
+        // Provide a function that *fetches* a fresh token every time
+        // the SDK asks for one.
+        // ===================================================================
+        getOAuthToken: async (cb) => {
+          console.log("Spotify SDK needs a new token...");
+          const token = await getNewAccessToken();
+          if (token) {
+            cb(token);
+          } else {
+            console.error("Failed to get new token for SDK");
+          }
+        },
         volume: 0.8,
       });
+      // ===================================================================
+
       playerRef.current = playerInstance;
 
-      // Mirror every SDK error to the console for faster debugging in the kiosk.
+      // ... all your listeners are perfect, no changes needed ...
       ["initialization_error", "authentication_error", "account_error", "playback_error"].forEach(
         (event) => {
           playerInstance.addListener(event, ({ message }) => {
@@ -82,7 +122,7 @@ export default function SpotifyPlayer({
       });
     };
 
-    // Load the SDK script once and reuse it across subsequent mounts.
+    // ... your script loading logic is fine, no changes needed ...
     if (!scriptLoadedRef.current) {
       const existingScript = document.querySelector(
         "script[src='https://sdk.scdn.co/spotify-player.js']"
@@ -108,7 +148,9 @@ export default function SpotifyPlayer({
     } else {
       window.onSpotifyWebPlaybackSDKReady = initializePlayer;
     }
-  }, [token, onReady, onPlayerStateChange, onActivateRequest]);
+
+    // Dependency array no longer needs 'token'
+  }, [onReady, onPlayerStateChange, onActivateRequest]);
 
   return null;
 }
