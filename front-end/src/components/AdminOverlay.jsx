@@ -21,6 +21,11 @@ const AdminOverlay = ({
     window.postMessage({ source: "HM_JUKEBOX_ADMIN", type: "OPEN_AUTODARTS" }, "*");
   };
 
+  const handleHardReload = () => {
+    if (typeof window === "undefined") return;
+    window.location.reload();
+  };
+
   return (
     <aside className="admin-overlay">
       <div className="admin-panel">
@@ -59,6 +64,9 @@ const AdminOverlay = ({
             </button>
             <button type="button" className="admin-accent" onClick={handleOpenAutodarts}>
               Open AutoDarts
+            </button>
+            <button type="button" className="admin-accent" onClick={handleHardReload}>
+              Reload Kiosk
             </button>
           </div>
         </section>
