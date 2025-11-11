@@ -8,6 +8,8 @@
     padding: 0 0 8px;
     border-bottom: 1px solid #0f0f0f;
     color: black;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .navbar-title {

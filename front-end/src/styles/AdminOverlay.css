@@ -12,6 +12,8 @@
   justify-content: center;
   padding: 24px;
   z-index: 10;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .admin-panel {
