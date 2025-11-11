@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import Login from "./pages/Login";
-import Home from "./pages/home";
+import Home from "./pages/Home";
 import Remote from "./pages/Remote";
 import { BACKEND_URL } from "./api/spotifyAPI";
 
