@@ -26,7 +26,6 @@ const AdminOverlay = ({
 
     try {
       const response = await git_pull()
-
       setGitUpdateMessage(response.message + "\n\n" + response.git_output)
     } catch (error) {
       setGitUpdateMessage(`Error: ${error.message}`)
@@ -79,9 +78,6 @@ const AdminOverlay = ({
             <button type="button" className="admin-accent" onClick={onRefreshToken}>
               Refresh Spotify Token
             </button>
-            {/* <button type="button" className="admin-accent" onClick={handleOpenAutodarts}>
-              Open AutoDarts
-            </button> */}
             <button type="button" className="admin-accent" onClick={handleHardReload}>
               Reload Kiosk
             </button>

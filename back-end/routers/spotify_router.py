@@ -151,7 +151,7 @@ def git_pull_and_reload() :
         return {
             "status" : "success",
             "message" : "Git pull successful. App is reloading",
-            "git_ouput": result.stdout
+            "git_output": result.stdout
         }
     
     except subprocess.CalledProcessError as e:
