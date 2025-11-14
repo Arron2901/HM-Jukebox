@@ -4,8 +4,6 @@
   right: 20%;
   height: 100%;
   width: 56vw;
-  /* background: rgba(32, 26, 58, 0.8); */
-  /* border-left: 6px solid rgba(0, 0, 0, 0.2); */
   border-radius: 0 32px 32px 0;
   display: flex;
   align-items: center;
@@ -74,11 +72,14 @@
   background: #87d780;
   font-size: 1rem;
   box-shadow: 0 6px 10px rgba(21, 21, 21, 0.25);
+  width: 320px;
+  height: 200px;
+  font-size: 30px;
 }
 
 .admin-advanced-buttons {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 12px;
 }
 

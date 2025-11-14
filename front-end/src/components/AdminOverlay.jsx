@@ -35,12 +35,6 @@ const AdminOverlay = ({
     }
   }
 
-  // Sends a signal to the helper extension so Chrome brings the AutoDarts tab forward (or opens it).
-  const handleOpenAutodarts = () => {
-    if (typeof window === "undefined") return;
-    window.postMessage({ source: "HM_JUKEBOX_ADMIN", type: "OPEN_AUTODARTS" }, "*");
-  };
-
   const handleHardReload = () => {
     if (typeof window === "undefined") return;
     window.location.reload();
@@ -79,8 +73,20 @@ const AdminOverlay = ({
         <section className="admin-section">
           <h3>Advanced Control</h3>
           <div className="admin-advanced-buttons">
-            <button type="button" className="admin-accent" onClick={handleGitPull} disabled={isPullingGit}>{isPullingGit? "Pulling..." : "Git Pull"}</button>
-            {gitUpdateMessage && (
+            <button type="button" className="admin-accent" onClick={handleGitPull} disabled={isPullingGit}>
+              {isPullingGit? "Pulling..." : "Git Pull"}
+            </button>
+            <button type="button" className="admin-accent" onClick={onRefreshToken}>
+              Refresh Spotify Token
+            </button>
+            {/* <button type="button" className="admin-accent" onClick={handleOpenAutodarts}>
+              Open AutoDarts
+            </button> */}
+            <button type="button" className="admin-accent" onClick={handleHardReload}>
+              Reload Kiosk
+            </button>
+          </div>
+          {gitUpdateMessage && (
               <pre style={{
                 marginTop: "15px",
                 textAlign: "left",
@@ -93,16 +99,6 @@ const AdminOverlay = ({
                 {gitUpdateMessage}
               </pre>
             )}
-            <button type="button" className="admin-accent" onClick={onRefreshToken}>
-              Refresh Spotify Token
-            </button>
-            <button type="button" className="admin-accent" onClick={handleOpenAutodarts}>
-              Open AutoDarts
-            </button>
-            <button type="button" className="admin-accent" onClick={handleHardReload}>
-              Reload Kiosk
-            </button>
-          </div>
         </section>
 
         <button type="button" className="admin-close" onClick={onClose}>

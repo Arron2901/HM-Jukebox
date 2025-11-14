@@ -26,12 +26,21 @@ const Navbar = ({ onAdminTrigger }) => {
     return `${base}/remote`;
   }, []);
 
+  // Sends a signal to the helper extension so Chrome brings the AutoDarts tab forward (or opens it).
+const handleOpenAutodarts = () => {
+  if (typeof window === "undefined") return;
+  window.postMessage({ source: "HM_JUKEBOX_ADMIN", type: "OPEN_AUTODARTS" }, "*");
+};
+
   return (
     <nav className="navbar">
       <div className="navbar-section navbar-left">
         <h1 className="navbar-title">The Headless Mouse Jukebox</h1>
       </div>
       <div className="navbar-section navbar-right">
+        <button type="button" className="dart-board" onClick={handleOpenAutodarts}>
+          🎯
+        </button>
         {remoteUrl && (
           <div className="remote-qr-block">
             <QRCodeCanvas value={remoteUrl} size={96} bgColor="#ffffff" fgColor="#111111" includeMargin />

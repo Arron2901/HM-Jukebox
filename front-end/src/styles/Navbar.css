@@ -67,6 +67,18 @@
     text-decoration: underline;
 }
 
+.dart-board {
+    width: 96px;
+    height: 96px;
+    font-size: 80px;
+    padding-bottom: 4%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background-color: white;
+}
+
 @media (max-width: 800px) {
   .playback-container {
     display: none;
