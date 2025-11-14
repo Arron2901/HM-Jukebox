@@ -378,7 +378,7 @@ export default function Home({ token, onManualRefreshToken, onAuthFailure }) {
     (isPlayingState, position, duration) => {
       if (!duration || duration <= 0) return;
       const remaining = duration - position;
-      if (remaining > 2000) return;
+      if (remaining > 3000) return;
       if (!isPlayingState && position <= 0 && !currentTrackRef.current) return;
       if (endTriggeredRef.current) return;
       const now = Date.now();
@@ -392,7 +392,7 @@ export default function Home({ token, onManualRefreshToken, onAuthFailure }) {
       advanceTimerRef.current = setTimeout(() => {
         playNext();
         advanceTimerRef.current = null;
-      }, 800);
+      }, 500);
     },
     [playNext, currentTrackRef]
   );
