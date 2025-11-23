@@ -5,6 +5,24 @@ const AUTODARTS_URL = "https://play.autodarts.io/";
 const JUKEBOX_MATCHERS = ["localhost:5173", "127.0.0.1:5173"];
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type === "HMJ_MINIMIZE_CHROME") {
+    const windowId = sender?.tab?.windowId;
+
+    if (typeof windowId !== "number") {
+      sendResponse({ success: false, reason: "Missing window id for minimizing" });
+      return true;
+    }
+
+    chrome.windows.update(windowId, { state: "minimized", focused: false }, () => {
+      if (chrome.runtime.lastError) {
+        sendResponse({ success: false, reason: chrome.runtime.lastError.message });
+        return;
+      }
+      sendResponse({ success: true, windowId });
+    });
+    return true;
+  }
+
   if (message?.type === "HMJ_OPEN_AUTODARTS") {
     chrome.tabs.query({}, (tabs) => {
       const existing = tabs.find((tab) => (tab.url || "").startsWith(AUTODARTS_URL));

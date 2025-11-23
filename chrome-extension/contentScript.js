@@ -20,13 +20,25 @@ window.addEventListener("message", (event) => {
 
   if (payload.type === "FOCUS_JUKEBOX") {
     chrome.runtime.sendMessage({ type: "HMJ_FOCUS_JUKEBOX" }, (response) => {
-    if (chrome.runtime.lastError) {
-      console.warn("HM Jukebox helper extension error:", chrome.runtime.lastError.message);
-      return;
-    }
-    if (!response?.success) {
-      console.warn("HM Jukebox helper extension failed:", response?.reason);
-    }
-  });
+      if (chrome.runtime.lastError) {
+        console.warn("HM Jukebox helper extension error:", chrome.runtime.lastError.message);
+        return;
+      }
+      if (!response?.success) {
+        console.warn("HM Jukebox helper extension failed:", response?.reason);
+      }
+    });
+  }
+
+  if (payload.type === "MINIMIZE_CHROME") {
+    chrome.runtime.sendMessage({ type: "HMJ_MINIMIZE_CHROME" }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.warn("HM Jukebox helper extension error:", chrome.runtime.lastError.message);
+        return;
+      }
+      if (!response?.success) {
+        console.warn("HM Jukebox helper extension failed:", response?.reason);
+      }
+    });
   }
 });

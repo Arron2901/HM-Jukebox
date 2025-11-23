@@ -3,7 +3,7 @@
   "name": "HM Jukebox Helper",
   "version": "1.0.0",
   "description": "Allows the kiosk admin overlay to trigger Chrome tab switches.",
-  "permissions": ["tabs"],
+  "permissions": ["tabs", "windows"],
   "host_permissions": [
     "http://localhost:5173/*",
     "http://127.0.0.1:5173/*",

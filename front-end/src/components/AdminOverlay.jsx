@@ -39,6 +39,11 @@ const AdminOverlay = ({
     window.location.reload();
   };
 
+  const handleMinimizeChrome = () => {
+    if (typeof window === "undefined") return;
+    window.postMessage({ source: "HM_JUKEBOX_ADMIN", type: "MINIMIZE_CHROME" }, "*");
+  };
+
   return (
     <div className="modal-background" onClick={onClose}>
     <div className="admin-overlay" onClick={(e) => e.stopPropagation()}>
@@ -80,6 +85,9 @@ const AdminOverlay = ({
             </button>
             <button type="button" className="admin-accent" onClick={handleHardReload}>
               Reload Kiosk
+            </button>
+            <button type="button" className="admin-accent" onClick={handleMinimizeChrome}>
+              Minimize Chrome
             </button>
           </div>
           {gitUpdateMessage && (
